@@ -1,0 +1,94 @@
+/* ClassBingo design tokens. Default (no data-theme attr) = dark, projector-friendly. */
+:root,
+:root[data-theme='dark'] {
+  --bg: #121815;
+  --bg-elevated: #1b2420;
+  --bg-card: #212c26;
+  --bg-tile: #263229;
+  --border: #35443b;
+  --border-strong: #4a5c4f;
+  --text: #f2f5f0;
+  --text-dim: #a9b6ac;
+  --text-faint: #6f7d73;
+  --accent: #8fe04b;
+  --accent-strong: #b6f27f;
+  --accent-contrast: #0d1a0a;
+  --warn: #f2b84b;
+  --danger: #f2604b;
+  --called: #8fe04b;
+  --uncalled: #3a473e;
+
+  --cat-alkali: #f2604b;
+  --cat-alkaline: #f2a04b;
+  --cat-transition: #f2d24b;
+  --cat-posttransition: #9bd94b;
+  --cat-metalloid: #4bd9a0;
+  --cat-nonmetal: #4bc4f2;
+  --cat-halogen: #6f9bf2;
+  --cat-noble: #a06ff2;
+  --cat-lanthanide: #d96ff2;
+  --cat-actinide: #f26fb0;
+
+  --type-igneous: #f2604b;
+  --type-sedimentary: #f2b84b;
+  --type-metamorphic: #6fa0f2;
+
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font-display: 'Georgia', 'Iowan Old Style', serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root[data-theme='light'] {
+  --bg: #f4f6f2;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-tile: #eef2ea;
+  --border: #d7ded2;
+  --border-strong: #b8c4ae;
+  --text: #16201a;
+  --text-dim: #4c5a50;
+  --text-faint: #7c897f;
+  --accent: #3f8f1f;
+  --accent-strong: #2e6b16;
+  --accent-contrast: #ffffff;
+  --warn: #a3690f;
+  --danger: #b23a2a;
+  --called: #3f8f1f;
+  --uncalled: #d7ded2;
+  --shadow: 0 8px 24px rgba(20, 30, 20, 0.12);
+}
+
+:root[data-theme='contrast'] {
+  --bg: #000000;
+  --bg-elevated: #000000;
+  --bg-card: #0a0a0a;
+  --bg-tile: #111111;
+  --border: #ffffff;
+  --border-strong: #ffffff;
+  --text: #ffffff;
+  --text-dim: #ffffff;
+  --text-faint: #cccccc;
+  --accent: #ffff00;
+  --accent-strong: #ffff66;
+  --accent-contrast: #000000;
+  --warn: #ffaa00;
+  --danger: #ff5555;
+  --called: #ffff00;
+  --uncalled: #333333;
+  --shadow: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}

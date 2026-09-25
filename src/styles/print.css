@@ -1,0 +1,74 @@
+/* Printing uses the browser's own Print / Save-as-PDF, so this is the
+   entire "PDF export" pipeline — no PDF library needed. */
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.5in;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .printable-root,
+  .printable-root * {
+    visibility: visible;
+  }
+
+  .printable-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-page {
+    break-after: page;
+    page-break-after: always;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .printable-card,
+  .call-sheet {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .printable-cell {
+    border-color: #000 !important;
+  }
+  .printable-cell.free {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+  }
+
+  .printable-card-footer,
+  .printable-card-classline,
+  .call-sheet-meta,
+  .call-sheet-secondary,
+  .call-sheet-index {
+    color: #333 !important;
+  }
+
+  .call-sheet-row {
+    border-color: #999 !important;
+  }
+}
