@@ -83,7 +83,9 @@ code-signed (that requires a paid certificate) — click **More info** →
 **Getting updates:** every time the app opens, it quietly checks this
 repo's latest published release. If there's a newer version, it downloads
 in the background and asks "Restart now?" the moment it's ready — no
-terminal, no `git`, nothing to type.
+terminal, no `git`, nothing to type. There's also a **Check for Updates**
+button on the home screen (with the current version next to it) if you
+want to check on demand instead of waiting for the next launch.
 
 **Shipping a new version** (for whoever maintains the repo): bump the
 version and push a tag —

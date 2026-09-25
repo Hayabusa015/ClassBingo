@@ -2,6 +2,7 @@ import { DECK_ORDER, DECKS } from '../data/decks';
 import type { DeckId } from '../data/types';
 import type { Theme } from '../lib/gameConfig';
 import ThemeToggle from './ThemeToggle';
+import UpdateChecker from './UpdateChecker';
 
 interface Props {
   onPick: (deckId: DeckId) => void;
@@ -21,6 +22,7 @@ export default function DeckPicker({ onPick, theme, onCycleTheme, resumeBanner }
   return (
     <div className="page page-home">
       <div className="page-corner-controls">
+        <UpdateChecker />
         <ThemeToggle theme={theme} onCycle={onCycleTheme} />
       </div>
       <header className="home-header">

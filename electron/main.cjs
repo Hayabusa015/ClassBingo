@@ -1,7 +1,7 @@
 // Electron main process. Kept as CommonJS (.cjs) regardless of the
 // project's "type": "module" in package.json, since electron-updater and
 // the classic Electron APIs are most reliably consumed as CJS here.
-const { app, BrowserWindow, dialog, shell } = require('electron');
+const { app, BrowserWindow, dialog, shell, ipcMain } = require('electron');
 const path = require('node:path');
 const { autoUpdater } = require('electron-updater');
 
@@ -15,6 +15,12 @@ const isPackaged = app.isPackaged;
 // server. When unset, the window loads the production build in dist/.
 const devServerUrl = process.env.ELECTRON_RENDERER_URL;
 
+// True only while a check the user explicitly asked for (the "Check for
+// Updates" button) is in flight — the automatic on-launch check stays
+// silent unless it actually finds something, but a manual check should
+// always tell the user *something*, even "you're already up to date".
+let manualCheckInProgress = false;
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -27,6 +33,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      preload: path.join(__dirname, 'preload.cjs'),
     },
   });
 
@@ -51,6 +58,27 @@ function createWindow() {
 
 /** Checks GitHub Releases for a newer published version and offers to install it. */
 function setupAutoUpdate(win) {
+  ipcMain.handle('app:get-version', () => app.getVersion());
+
+  ipcMain.handle('app:check-for-updates', async () => {
+    if (!isPackaged) {
+      dialog.showMessageBox(win, {
+        type: 'info',
+        title: 'ClassBingo',
+        message: "Update checks only run in the installed app, not this dev copy.",
+      });
+      return { ok: false, reason: 'not-packaged' };
+    }
+    manualCheckInProgress = true;
+    try {
+      await autoUpdater.checkForUpdates();
+      return { ok: true };
+    } catch (err) {
+      manualCheckInProgress = false;
+      return { ok: false, reason: err instanceof Error ? err.message : String(err) };
+    }
+  });
+
   if (!isPackaged) return;
 
   autoUpdater.autoDownload = true;
@@ -58,11 +86,34 @@ function setupAutoUpdate(win) {
 
   autoUpdater.on('error', (err) => {
     // Never interrupt a class over a failed update check (offline, no
-    // releases published yet, GitHub hiccup, etc.) — just log it.
+    // releases published yet, GitHub hiccup, etc.) — just log it, unless
+    // someone explicitly asked by clicking the button.
     console.error('[updater] error:', err && (err.stack || err.message) ? err.stack || err.message : err);
+    if (manualCheckInProgress) {
+      manualCheckInProgress = false;
+      dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'ClassBingo',
+        message: "Couldn't check for updates.",
+        detail: 'Check the internet connection and try again in a moment.',
+      });
+    }
+  });
+
+  autoUpdater.on('update-not-available', (info) => {
+    if (manualCheckInProgress) {
+      manualCheckInProgress = false;
+      dialog.showMessageBox(win, {
+        type: 'info',
+        title: 'ClassBingo',
+        message: "You're up to date!",
+        detail: `Running the latest version (${info.version}).`,
+      });
+    }
   });
 
   autoUpdater.on('update-downloaded', (info) => {
+    manualCheckInProgress = false;
     dialog
       .showMessageBox(win, {
         type: 'info',
@@ -80,6 +131,8 @@ function setupAutoUpdate(win) {
   });
 
   // One check per launch, as requested — not a recurring background poll.
+  // This one stays silent on "nothing found" (manualCheckInProgress is
+  // false here), unlike a check kicked off from the button.
   autoUpdater.checkForUpdates().catch((err) => {
     console.error('[updater] check failed:', err);
   });

@@ -12,7 +12,19 @@
   top: 24px;
   right: 24px;
   display: flex;
+  align-items: center;
   gap: 6px;
+}
+
+.update-checker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-version-stamp {
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .btn {
