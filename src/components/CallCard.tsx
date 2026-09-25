@@ -1,6 +1,14 @@
+import type { CSSProperties } from 'react';
 import type { BingoItem, CardFaceField, DeckConfig } from '../data/types';
 import type { CallStyle } from '../lib/gameConfig';
 import { renderIon } from '../lib/formula';
+
+export interface BounceOffset {
+  x: number;
+  y: number;
+  rot: number;
+  scale: number;
+}
 
 interface Props {
   deck: DeckConfig;
@@ -11,6 +19,7 @@ interface Props {
   onReveal: () => void;
   isShuffling: boolean;
   shuffleDisplayItem: BingoItem | null;
+  bounceOffset: BounceOffset;
 }
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -47,12 +56,22 @@ export default function CallCard({
   onReveal,
   isShuffling,
   shuffleDisplayItem,
+  bounceOffset,
 }: Props) {
   if (isShuffling) {
     const shown = shuffleDisplayItem ?? item;
+    const textStyle: CSSProperties = {
+      transform: `translate(${bounceOffset.x}px, ${bounceOffset.y}px) rotate(${bounceOffset.rot}deg) scale(${bounceOffset.scale})`,
+    };
+    const ballStyle: CSSProperties = {
+      transform: `translate(${bounceOffset.x * 0.7}px, ${bounceOffset.y}px)`,
+    };
     return (
       <div className="call-card shuffling">
-        <div className="call-card-shuffle-text">{shown ? deck.callHeadline(shown) : '?'}</div>
+        <span className="bounce-ball" style={ballStyle} aria-hidden />
+        <div className="call-card-shuffle-text" style={textStyle}>
+          {shown ? deck.callHeadline(shown) : '?'}
+        </div>
       </div>
     );
   }
@@ -72,7 +91,7 @@ export default function CallCard({
   const sublineHidden = hiddenField === 'subline';
 
   return (
-    <div className={`call-card deck-${deck.id}`}>
+    <div className={`call-card call-card-landed deck-${deck.id}`}>
       {deck.id === 'elements' ? (
         <ElementTile item={item} dimmed={headlineHidden} />
       ) : deck.id === 'ions' ? (

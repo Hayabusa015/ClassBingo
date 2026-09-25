@@ -8,7 +8,8 @@ import type { WinPattern } from '../lib/bingo';
 import { loadState, saveState, clearState } from '../lib/storage';
 import { playCallSound, playWinSound } from '../lib/sound';
 import { renderDisplayText } from '../lib/formula';
-import CallCard from './CallCard';
+import CallCard, { type BounceOffset } from './CallCard';
+import CalledList from './CalledList';
 import CalledBoard from './CalledBoard';
 import WinnerCheck from './WinnerCheck';
 import ConfettiBurst from './ConfettiBurst';
@@ -23,8 +24,19 @@ interface Props {
 
 type Theme = 'dark' | 'light' | 'contrast';
 const THEME_ORDER: Theme[] = ['dark', 'light', 'contrast'];
-const SHUFFLE_MS = 1100;
-const SHUFFLE_TICK_MS = 70;
+const SHUFFLE_MS = 1300;
+const SHUFFLE_TICK_MS = 130;
+const REST_OFFSET: BounceOffset = { x: 0, y: 0, rot: 0, scale: 1 };
+
+/** A random hop for the shuffle animation — mostly upward, like a bounced ball. */
+function randomBounceOffset(): BounceOffset {
+  return {
+    x: (Math.random() - 0.5) * 150,
+    y: -Math.random() * 100,
+    rot: (Math.random() - 0.5) * 26,
+    scale: 0.85 + Math.random() * 0.3,
+  };
+}
 
 export default function Caller({ deck, settings, callStyle, winPattern, onExit }: Props) {
   const drawOrder = useMemo(() => generateDrawOrder(deck, settings), [deck, settings]);
@@ -35,6 +47,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
   const [peekItem, setPeekItem] = useState<BingoItem | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [shuffleDisplayItem, setShuffleDisplayItem] = useState<BingoItem | null>(null);
+  const [bounceOffset, setBounceOffset] = useState<BounceOffset>(REST_OFFSET);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
   const [autoCallOn, setAutoCallOn] = useState(false);
@@ -96,11 +109,13 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
     animTimerRef.current = window.setInterval(() => {
       const randomPick = drawOrder[Math.floor(Math.random() * drawOrder.length)];
       setShuffleDisplayItem(randomPick);
+      setBounceOffset(randomBounceOffset());
       if (Date.now() - start >= SHUFFLE_MS) {
         stopShuffleTimer();
         isAnimatingRef.current = false;
         setIsAnimating(false);
         setShuffleDisplayItem(null);
+        setBounceOffset(REST_OFFSET);
         setCalledIds((prev) => {
           if (prev.length >= drawOrder.length) return prev;
           return [...prev, drawOrder[prev.length].id];
@@ -192,6 +207,8 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
     .map((id) => itemById.get(id))
     .filter((i): i is BingoItem => !!i);
 
+  const calledItemsInOrder = calledIds.map((id) => itemById.get(id)).filter((i): i is BingoItem => !!i);
+
   return (
     <div className="page page-caller">
       <ConfettiBurst active={celebrate} />
@@ -224,6 +241,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
       <div className="caller-main">
         <div className="caller-call-area">
           <CallCard
+            key={currentItem?.id ?? 'empty'}
             deck={deck}
             item={currentItem}
             cardFace={settings.cardFace}
@@ -232,6 +250,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
             onReveal={handleReveal}
             isShuffling={isAnimating}
             shuffleDisplayItem={shuffleDisplayItem}
+            bounceOffset={bounceOffset}
           />
 
           {peekItem && (
@@ -289,6 +308,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
         </div>
 
         <aside className="caller-sidebar">
+          <CalledList deck={deck} calledItems={calledItemsInOrder} />
           <CalledBoard deck={deck} items={drawOrder} calledIds={calledIdSet} onPeek={setPeekItem} />
           <WinnerCheck deck={deck} settings={settings} calledIds={calledIdSet} winPattern={winPattern} onWin={handleWin} />
         </aside>
