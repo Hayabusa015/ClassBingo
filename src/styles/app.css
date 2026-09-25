@@ -4,6 +4,15 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+}
+
+.page-corner-controls {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  gap: 6px;
 }
 
 .btn {
@@ -369,10 +378,10 @@
 }
 @keyframes pulse-bg {
   from {
-    box-shadow: 0 0 0 rgba(143, 224, 75, 0);
+    box-shadow: 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent);
   }
   to {
-    box-shadow: 0 0 40px rgba(143, 224, 75, 0.25);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 25%, transparent);
   }
 }
 @keyframes card-land {
@@ -590,7 +599,7 @@
   font-size: 0.95rem;
 }
 .called-list-row.current {
-  background: rgba(143, 224, 75, 0.14);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 .called-list-num {
   color: var(--text-faint);
@@ -697,11 +706,11 @@
   margin-bottom: 8px;
 }
 .winner-check-banner.win {
-  background: rgba(143, 224, 75, 0.18);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
   color: var(--accent-strong);
 }
 .winner-check-banner.not-win {
-  background: rgba(242, 96, 75, 0.12);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
   color: var(--danger);
 }
 .winner-check-missing {
@@ -912,6 +921,86 @@
 .call-sheet-secondary {
   color: var(--text-dim);
   font-size: 0.85rem;
+}
+
+/* ===== Violet theme signature treatments ("Element Violet") ===== */
+:root[data-theme='violet'] .home-header h1 {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 28px var(--glow-violet));
+}
+
+:root[data-theme='violet'] .btn-primary {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 20px var(--glow-violet);
+}
+:root[data-theme='violet'] .btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 28px var(--glow-pink);
+}
+
+/* Glowing gradient-ring border on the two hero cards, via a masked pseudo-
+   element (a solid border-color can't be a gradient with rounded corners). */
+:root[data-theme='violet'] .deck-tile,
+:root[data-theme='violet'] .call-card {
+  position: relative;
+  border-color: transparent;
+}
+:root[data-theme='violet'] .deck-tile::before,
+:root[data-theme='violet'] .call-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--accent-gradient);
+  opacity: 0.55;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+:root[data-theme='violet'] .deck-tile:hover::before {
+  opacity: 1;
+}
+:root[data-theme='violet'] .deck-tile:hover {
+  box-shadow: 0 0 0 1px var(--glow-violet), 0 16px 44px var(--glow-violet);
+}
+
+:root[data-theme='violet'] .setup-card,
+:root[data-theme='violet'] .called-board,
+:root[data-theme='violet'] .called-list,
+:root[data-theme='violet'] .winner-check,
+:root[data-theme='violet'] .resume-banner,
+:root[data-theme='violet'] .cardgen-controls {
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+  backdrop-filter: blur(10px);
+}
+
+/* Neon periodic-table tile — keeps each category's own color (still
+   functional) but gives it the reference card's glowing-card treatment. */
+:root[data-theme='violet'] .element-tile {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), transparent 60%), var(--bg-tile);
+  box-shadow: 0 0 34px currentColor, 0 0 0 1px currentColor inset;
+}
+
+:root[data-theme='violet'] .ion-headline,
+:root[data-theme='violet'] .generic-headline {
+  filter: drop-shadow(0 0 20px var(--glow-violet));
+}
+
+:root[data-theme='violet'] .call-card-landed {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), var(--shadow);
+}
+
+:root[data-theme='violet'] .bounce-ball {
+  background: var(--accent-gradient);
+  box-shadow: 0 0 18px var(--glow-pink), 0 10px 18px rgba(0, 0, 0, 0.35);
 }
 
 /* ===== Responsive ===== */

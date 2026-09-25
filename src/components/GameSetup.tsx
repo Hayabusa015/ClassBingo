@@ -2,8 +2,9 @@ import type { DeckConfig, CardFaceField } from '../data/types';
 import type { GameSettings, GridSize } from '../lib/cards';
 import { getFilteredItems, requiredItemCount, canGenerateCards, hasFreeCenter } from '../lib/cards';
 import { WIN_PATTERNS, type WinPattern } from '../lib/bingo';
-import type { CallStyle } from '../lib/gameConfig';
+import type { CallStyle, Theme } from '../lib/gameConfig';
 import { randomGameCode } from '../lib/rng';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   deck: DeckConfig;
@@ -16,6 +17,8 @@ interface Props {
   onStartCaller: () => void;
   onStartCardGenerator: () => void;
   onBack: () => void;
+  theme: Theme;
+  onCycleTheme: () => void;
 }
 
 const GRID_SIZES: GridSize[] = [3, 4, 5];
@@ -31,6 +34,8 @@ export default function GameSetup({
   onStartCaller,
   onStartCardGenerator,
   onBack,
+  theme,
+  onCycleTheme,
 }: Props) {
   const itemCount = getFilteredItems(deck, settings.filterId).length;
   const need = requiredItemCount(settings);
@@ -46,6 +51,7 @@ export default function GameSetup({
           ← Back
         </button>
         <h1>{deck.title}</h1>
+        <ThemeToggle theme={theme} onCycle={onCycleTheme} />
       </header>
 
       <div className="setup-grid">

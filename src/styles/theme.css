@@ -80,6 +80,45 @@
   --shadow: none;
 }
 
+/* "Element Violet" — Asphalt Black / Slate / Electric Violet / Neon Pink. */
+:root[data-theme='violet'] {
+  --bg: #0c0d11;
+  --bg-elevated: #14161b;
+  --bg-card: #191c23;
+  --bg-tile: #20232c;
+  --border: #2c2f36;
+  --border-strong: #40444f;
+  --text: #f5f3ff;
+  --text-dim: #b7b2cc;
+  --text-faint: #726f85;
+  --accent: #a855f7;
+  --accent-strong: #ff3d8e;
+  --accent-contrast: #ffffff;
+  --warn: #ffb84b;
+  --danger: #ff3d8e;
+  --called: #a855f7;
+  --uncalled: #20232c;
+
+  --accent-gradient: linear-gradient(135deg, #a855f7 0%, #ff3d8e 100%);
+  --glow-violet: rgba(168, 85, 247, 0.4);
+  --glow-pink: rgba(255, 61, 142, 0.35);
+
+  --shadow: 0 10px 32px rgba(168, 85, 247, 0.16), 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Glass panels: a translucent card fill so the glow behind it can bleed
+   through where backdrop-filter is applied (app.css). */
+:root[data-theme='violet'] .deck-tile,
+:root[data-theme='violet'] .setup-card,
+:root[data-theme='violet'] .call-card,
+:root[data-theme='violet'] .called-board,
+:root[data-theme='violet'] .called-list,
+:root[data-theme='violet'] .winner-check,
+:root[data-theme='violet'] .resume-banner,
+:root[data-theme='violet'] .cardgen-controls {
+  background: rgba(25, 28, 35, 0.72);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -91,4 +130,24 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
+}
+
+/* Soft bokeh glow + faint tech grid — no image assets, so it scales to any
+   screen and stays out of the way of the print stylesheet. */
+:root[data-theme='violet'] body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 640px 520px at 10% 6%, var(--glow-violet), transparent 60%),
+    radial-gradient(ellipse 520px 480px at 92% 18%, var(--glow-pink), transparent 60%),
+    radial-gradient(ellipse 700px 560px at 50% 108%, var(--glow-violet), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    auto,
+    46px 46px,
+    46px 46px;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
+  background-attachment: fixed, fixed, fixed, fixed, fixed;
 }

@@ -1,8 +1,12 @@
 import { DECK_ORDER, DECKS } from '../data/decks';
 import type { DeckId } from '../data/types';
+import type { Theme } from '../lib/gameConfig';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   onPick: (deckId: DeckId) => void;
+  theme: Theme;
+  onCycleTheme: () => void;
   resumeBanner?: { label: string; onResume: () => void; onDiscard: () => void } | null;
 }
 
@@ -13,9 +17,12 @@ const DECK_ICON: Record<DeckId, string> = {
   rocks: '🪨',
 };
 
-export default function DeckPicker({ onPick, resumeBanner }: Props) {
+export default function DeckPicker({ onPick, theme, onCycleTheme, resumeBanner }: Props) {
   return (
     <div className="page page-home">
+      <div className="page-corner-controls">
+        <ThemeToggle theme={theme} onCycle={onCycleTheme} />
+      </div>
       <header className="home-header">
         <h1>ClassBingo</h1>
         <p className="subtitle">Pick a game to call or print cards for.</p>

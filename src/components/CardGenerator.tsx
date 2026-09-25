@@ -1,14 +1,18 @@
 import { useMemo, useState } from 'react';
 import type { DeckConfig } from '../data/types';
 import { generateCard, getFilteredItems, type GameSettings } from '../lib/cards';
+import type { Theme } from '../lib/gameConfig';
 import PrintableCard from './PrintableCard';
 import CallSheet from './CallSheet';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   deck: DeckConfig;
   settings: GameSettings;
   onExit: () => void;
   onStartCaller: () => void;
+  theme: Theme;
+  onCycleTheme: () => void;
 }
 
 type ViewMode = 'cards' | 'callsheet';
@@ -23,7 +27,7 @@ function chunk<T>(items: T[], size: number): T[][] {
   return out;
 }
 
-export default function CardGenerator({ deck, settings, onExit, onStartCaller }: Props) {
+export default function CardGenerator({ deck, settings, onExit, onStartCaller, theme, onCycleTheme }: Props) {
   const defaultTitle = `${deck.shortTitle.toUpperCase()} BINGO`;
   const [numCards, setNumCards] = useState(30);
   const [cardsPerPage, setCardsPerPage] = useState<number>(cardsPerPageOptions(settings.gridSize)[0]);
@@ -49,6 +53,7 @@ export default function CardGenerator({ deck, settings, onExit, onStartCaller }:
         <button className="btn btn-secondary" onClick={onStartCaller}>
           Start Calling This Game ▶
         </button>
+        <ThemeToggle theme={theme} onCycle={onCycleTheme} />
       </header>
 
       <div className="cardgen-controls no-print">

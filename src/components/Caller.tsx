@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { BingoItem, DeckConfig } from '../data/types';
 import type { GameSettings } from '../lib/cards';
 import { generateDrawOrder } from '../lib/cards';
-import type { CallStyle } from '../lib/gameConfig';
+import type { CallStyle, Theme } from '../lib/gameConfig';
 import { callerProgressKey } from '../lib/gameConfig';
 import type { WinPattern } from '../lib/bingo';
 import { loadState, saveState, clearState } from '../lib/storage';
@@ -13,6 +13,7 @@ import CalledList from './CalledList';
 import CalledBoard from './CalledBoard';
 import WinnerCheck from './WinnerCheck';
 import ConfettiBurst from './ConfettiBurst';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   deck: DeckConfig;
@@ -20,10 +21,10 @@ interface Props {
   callStyle: CallStyle;
   winPattern: WinPattern;
   onExit: () => void;
+  theme: Theme;
+  onCycleTheme: () => void;
 }
 
-type Theme = 'dark' | 'light' | 'contrast';
-const THEME_ORDER: Theme[] = ['dark', 'light', 'contrast'];
 const SHUFFLE_MS = 1300;
 const SHUFFLE_TICK_MS = 130;
 const REST_OFFSET: BounceOffset = { x: 0, y: 0, rot: 0, scale: 1 };
@@ -38,7 +39,7 @@ function randomBounceOffset(): BounceOffset {
   };
 }
 
-export default function Caller({ deck, settings, callStyle, winPattern, onExit }: Props) {
+export default function Caller({ deck, settings, callStyle, winPattern, onExit, theme, onCycleTheme }: Props) {
   const drawOrder = useMemo(() => generateDrawOrder(deck, settings), [deck, settings]);
   const progressKey = useMemo(() => callerProgressKey(settings, deck.id), [settings, deck.id]);
 
@@ -53,7 +54,6 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
   const [autoCallOn, setAutoCallOn] = useState(false);
   const [autoCallSeconds, setAutoCallSeconds] = useState(8);
 
-  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'dark');
   const [soundOn, setSoundOn] = useState<boolean>(() => loadState<boolean>('ui:sound') ?? true);
 
   const animTimerRef = useRef<number | null>(null);
@@ -70,11 +70,6 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
   useEffect(() => {
     saveState(progressKey, calledIds);
   }, [calledIds, progressKey]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    saveState('ui:theme', theme);
-  }, [theme]);
 
   useEffect(() => {
     saveState('ui:sound', soundOn);
@@ -145,10 +140,6 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
     } catch {
       // fullscreen not supported — ignore
     }
-  };
-
-  const cycleTheme = () => {
-    setTheme((t) => THEME_ORDER[(THEME_ORDER.indexOf(t) + 1) % THEME_ORDER.length]);
   };
 
   const confirmReset = () => {
@@ -224,9 +215,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit }
           <button className="btn btn-ghost icon-btn" onClick={() => setSoundOn((s) => !s)} title="Toggle sound (M)">
             {soundOn ? '🔊' : '🔇'}
           </button>
-          <button className="btn btn-ghost icon-btn" onClick={cycleTheme} title="Cycle theme">
-            🎨
-          </button>
+          <ThemeToggle theme={theme} onCycle={onCycleTheme} />
           <button className="btn btn-ghost icon-btn" onClick={toggleFullscreen} title="Fullscreen (F)">
             ⛶
           </button>

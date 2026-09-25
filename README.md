@@ -37,8 +37,9 @@ npm test          # run the unit test suite
 - **Undo** (Backspace) takes back the last call.
 - **Reveal** (R) — only in Challenge mode — shows the hidden side of the
   current call.
-- **F** toggles fullscreen, **M** toggles sound, and the palette icon cycles
-  dark / light / high-contrast themes.
+- **F** toggles fullscreen, **M** toggles sound, and the palette icon (on
+  every screen) cycles **Violet** (the default — a glowing dark
+  asphalt/electric-violet/neon-pink theme) → Dark → Light → High contrast.
 - The **called board** on the side shows every item in play; called ones
   light up, and clicking any tile re-displays it without affecting game
   state.

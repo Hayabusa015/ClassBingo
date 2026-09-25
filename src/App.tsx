@@ -3,8 +3,8 @@ import { getDeck } from './data/decks';
 import type { DeckId } from './data/types';
 import type { GameSettings } from './lib/cards';
 import type { WinPattern } from './lib/bingo';
-import type { CallStyle, SessionState, View } from './lib/gameConfig';
-import { SESSION_KEY } from './lib/gameConfig';
+import type { CallStyle, SessionState, Theme, View } from './lib/gameConfig';
+import { SESSION_KEY, THEME_ORDER } from './lib/gameConfig';
 import { loadState, saveState, clearState } from './lib/storage';
 import { randomGameCode } from './lib/rng';
 import DeckPicker from './components/DeckPicker';
@@ -31,6 +31,7 @@ export default function App() {
   const [callStyle, setCallStyle] = useState<CallStyle>('both');
   const [winPattern, setWinPattern] = useState<WinPattern>('line');
   const [resumable, setResumable] = useState<SessionState | null>(null);
+  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'violet');
 
   // On first load, check for a saved in-progress game to offer resuming.
   useEffect(() => {
@@ -39,6 +40,16 @@ export default function App() {
       setResumable(saved);
     }
   }, []);
+
+  // Theme applies globally (every screen), not just the caller.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    saveState('ui:theme', theme);
+  }, [theme]);
+
+  const cycleTheme = () => {
+    setTheme((t) => THEME_ORDER[(THEME_ORDER.indexOf(t) + 1) % THEME_ORDER.length]);
+  };
 
   // Persist navigation state so a page refresh can resume the same game.
   useEffect(() => {
@@ -81,6 +92,8 @@ export default function App() {
     return (
       <DeckPicker
         onPick={handlePickDeck}
+        theme={theme}
+        onCycleTheme={cycleTheme}
         resumeBanner={
           resumable
             ? {
@@ -109,6 +122,8 @@ export default function App() {
         onStartCaller={() => setView('caller')}
         onStartCardGenerator={() => setView('cardgen')}
         onBack={handleBackToHome}
+        theme={theme}
+        onCycleTheme={cycleTheme}
       />
     );
   }
@@ -121,11 +136,20 @@ export default function App() {
         callStyle={callStyle}
         winPattern={winPattern}
         onExit={() => setView('setup')}
+        theme={theme}
+        onCycleTheme={cycleTheme}
       />
     );
   }
 
   return (
-    <CardGenerator deck={deck} settings={settings} onExit={() => setView('setup')} onStartCaller={() => setView('caller')} />
+    <CardGenerator
+      deck={deck}
+      settings={settings}
+      onExit={() => setView('setup')}
+      onStartCaller={() => setView('caller')}
+      theme={theme}
+      onCycleTheme={cycleTheme}
+    />
   );
 }

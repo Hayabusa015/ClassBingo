@@ -5,6 +5,15 @@ import type { DeckId } from '../data/types';
 /** 'both' shows name+symbol/formula together; 'challenge' shows only the side not on student cards. */
 export type CallStyle = 'both' | 'challenge';
 
+export type Theme = 'violet' | 'dark' | 'light' | 'contrast';
+export const THEME_ORDER: Theme[] = ['violet', 'dark', 'light', 'contrast'];
+export const THEME_LABEL: Record<Theme, string> = {
+  violet: 'Violet',
+  dark: 'Dark',
+  light: 'Light',
+  contrast: 'High contrast',
+};
+
 export type View = 'home' | 'setup' | 'caller' | 'cardgen';
 
 export interface SessionState {
