@@ -745,6 +745,83 @@
   font-weight: 700;
 }
 
+/* ===== Bingo Mode: a big, distraction-free display for the class board ===== */
+.bingo-mode-btn {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.page-caller.bingo-mode {
+  max-width: none;
+  padding: 24px 40px;
+}
+
+.bingo-mode .caller-main {
+  grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
+}
+
+.bingo-mode .caller-call-area {
+  height: calc(100vh - 160px);
+  justify-content: center;
+}
+
+.bingo-mode .call-card {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  gap: 32px;
+}
+
+.bingo-mode .element-tile {
+  width: min(620px, 46vw);
+}
+.bingo-mode .element-tile-symbol {
+  font-size: clamp(6rem, 17vw, 13rem);
+}
+.bingo-mode .element-tile-category {
+  font-size: 1.6rem;
+}
+.bingo-mode .element-tile-number {
+  font-size: 2.2rem;
+}
+.bingo-mode .generic-headline {
+  font-size: clamp(4rem, 11vw, 8.5rem);
+}
+.bingo-mode .ion-headline {
+  font-size: clamp(4.5rem, 13vw, 10rem);
+}
+.bingo-mode .call-card-subline {
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+}
+.bingo-mode .call-card-shuffle-text {
+  font-size: clamp(4rem, 13vw, 9rem);
+}
+
+.bingo-mode .called-list {
+  padding: 22px;
+}
+.bingo-mode .called-list-header h3 {
+  font-size: 1.3rem;
+}
+.bingo-mode .called-list-count {
+  font-size: 1rem;
+  padding: 4px 14px;
+}
+.bingo-mode .called-list-items {
+  max-height: 56vh;
+  gap: 6px;
+}
+.bingo-mode .called-list-row {
+  font-size: 1.35rem;
+  padding: 10px 12px;
+}
+.bingo-mode .called-list-num {
+  font-size: 1rem;
+}
+.bingo-mode .called-list-badge {
+  font-size: 1.1rem;
+}
+
 /* ===== Confetti ===== */
 .confetti-layer {
   position: fixed;
@@ -1007,7 +1084,8 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
-  .caller-main {
+  .caller-main,
+  .bingo-mode .caller-main {
     grid-template-columns: 1fr;
   }
   .caller-sidebar {

@@ -40,9 +40,16 @@ npm test          # run the unit test suite
 - **F** toggles fullscreen, **M** toggles sound, and the palette icon (on
   every screen) cycles **Violet** (the default — a glowing dark
   asphalt/electric-violet/neon-pink theme) → Dark → Light → High contrast.
-- The **called board** on the side shows every item in play; called ones
-  light up, and clicking any tile re-displays it without affecting game
-  state.
+- **Bingo Mode** (button in the header, or **B**) switches to a big,
+  distraction-free display for the class board: a much larger call card,
+  a bigger "Called so far" list, and the full item grid hidden — just what
+  students need to see. It also goes fullscreen automatically. Click
+  **Exit Bingo Mode** (or press B again) to get the item grid back.
+- The **called board** ("All items", hidden in Bingo Mode) shows every item
+  in play; called ones light up, and clicking any tile re-displays it
+  without affecting game state.
+- The **"Called so far"** list is a plain-language, numbered log of every
+  call — read straight off it instead of repeating calls out loud.
 - **Check a winner**: type a student's card number and it's regenerated from
   the game code and checked against everything called so far — no manual
   bingo-checking required.

@@ -39,6 +39,26 @@ function randomBounceOffset(): BounceOffset {
   };
 }
 
+/**
+ * requestFullscreen()/exitFullscreen() return a promise that can reject
+ * asynchronously (denied by the browser, no user gesture, iframe policy,
+ * headless environments, etc.) — a plain try/catch around the call does
+ * NOT catch that, so it must be handled on the promise itself or it
+ * surfaces as an unhandled rejection. Fullscreen is a nice-to-have here,
+ * never something worth failing loudly over.
+ */
+function setFullscreen(enter: boolean): void {
+  try {
+    if (enter && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen()?.catch(() => {});
+    } else if (!enter && document.fullscreenElement) {
+      document.exitFullscreen()?.catch(() => {});
+    }
+  } catch {
+    // fullscreen not supported — ignore
+  }
+}
+
 export default function Caller({ deck, settings, callStyle, winPattern, onExit, theme, onCycleTheme }: Props) {
   const drawOrder = useMemo(() => generateDrawOrder(deck, settings), [deck, settings]);
   const progressKey = useMemo(() => callerProgressKey(settings, deck.id), [settings, deck.id]);
@@ -55,6 +75,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
   const [autoCallSeconds, setAutoCallSeconds] = useState(8);
 
   const [soundOn, setSoundOn] = useState<boolean>(() => loadState<boolean>('ui:sound') ?? true);
+  const [bingoMode, setBingoMode] = useState<boolean>(() => loadState<boolean>('ui:bingoMode') ?? false);
 
   const animTimerRef = useRef<number | null>(null);
   const isAnimatingRef = useRef(false);
@@ -74,6 +95,10 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
   useEffect(() => {
     saveState('ui:sound', soundOn);
   }, [soundOn]);
+
+  useEffect(() => {
+    saveState('ui:bingoMode', bingoMode);
+  }, [bingoMode]);
 
   const itemById = useMemo(() => {
     const map = new Map<string, BingoItem>();
@@ -131,16 +156,16 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
   const handleReveal = useCallback(() => setRevealed(true), []);
 
   const toggleFullscreen = () => {
-    try {
-      if (!document.fullscreenElement) {
-        void document.documentElement.requestFullscreen();
-      } else {
-        void document.exitFullscreen();
-      }
-    } catch {
-      // fullscreen not supported — ignore
-    }
+    setFullscreen(!document.fullscreenElement);
   };
+
+  const toggleBingoMode = useCallback(() => {
+    setBingoMode((prev) => {
+      const next = !prev;
+      setFullscreen(next);
+      return next;
+    });
+  }, []);
 
   const confirmReset = () => {
     clearState(progressKey);
@@ -173,11 +198,13 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
         toggleFullscreen();
       } else if (e.key.toLowerCase() === 'm') {
         setSoundOn((s) => !s);
+      } else if (e.key.toLowerCase() === 'b') {
+        toggleBingoMode();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleNext, handleUndo, handleReveal, callStyle]);
+  }, [handleNext, handleUndo, handleReveal, callStyle, toggleBingoMode]);
 
   // Auto-call
   useEffect(() => {
@@ -201,7 +228,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
   const calledItemsInOrder = calledIds.map((id) => itemById.get(id)).filter((i): i is BingoItem => !!i);
 
   return (
-    <div className="page page-caller">
+    <div className={`page page-caller ${bingoMode ? 'bingo-mode' : ''}`}>
       <ConfettiBurst active={celebrate} />
       <header className="caller-header">
         <button className="btn btn-ghost" onClick={onExit}>
@@ -212,6 +239,13 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
           <span className="game-code-badge">Code {settings.gameCode}</span>
         </div>
         <div className="caller-header-controls">
+          <button
+            className={`btn ${bingoMode ? 'btn-primary' : 'btn-secondary'} bingo-mode-btn`}
+            onClick={toggleBingoMode}
+            title="Big, distraction-free display for the class board (B)"
+          >
+            {bingoMode ? '✕ Exit Bingo Mode' : '🖥 Bingo Mode'}
+          </button>
           <button className="btn btn-ghost icon-btn" onClick={() => setSoundOn((s) => !s)} title="Toggle sound (M)">
             {soundOn ? '🔊' : '🔇'}
           </button>
@@ -298,7 +332,7 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
 
         <aside className="caller-sidebar">
           <CalledList deck={deck} calledItems={calledItemsInOrder} />
-          <CalledBoard deck={deck} items={drawOrder} calledIds={calledIdSet} onPeek={setPeekItem} />
+          {!bingoMode && <CalledBoard deck={deck} items={drawOrder} calledIds={calledIdSet} onPeek={setPeekItem} />}
           <WinnerCheck deck={deck} settings={settings} calledIds={calledIdSet} winPattern={winPattern} onWin={handleWin} />
         </aside>
       </div>
