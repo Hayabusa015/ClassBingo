@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - run: npm ci
 
@@ -44,6 +44,21 @@ jobs:
             git tag "$TAG"
             git push origin "$TAG"
           fi
+
+      - name: Ensure the GitHub release exists
+        shell: bash
+        # electron-builder uploads the installer and its .blockmap in
+        # parallel; if neither the release nor a differential base exists
+        # yet, both uploads race to create it and the loser 422s. Creating
+        # it up front (idempotently) removes the race entirely.
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --generate-notes
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: npm run build
 
