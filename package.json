@@ -1,7 +1,7 @@
 {
   "name": "classbingo",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A projector-friendly bingo caller and printable-card generator for science classrooms.",
   "author": "Matthew Shull",
   "type": "module",
