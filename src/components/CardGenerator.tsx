@@ -18,7 +18,7 @@ interface Props {
 type ViewMode = 'cards' | 'callsheet';
 
 function cardsPerPageOptions(gridSize: number): number[] {
-  return gridSize === 5 ? [1, 2] : [2, 4];
+  return gridSize === 5 ? [1, 2, 4] : [2, 4];
 }
 
 function chunk<T>(items: T[], size: number): T[][] {
