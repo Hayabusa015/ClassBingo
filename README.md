@@ -1,4 +1,4 @@
-# ClassBingo
+# BingoBash
 
 A projector-friendly bingo caller and printable-card generator for four science
 games:
@@ -69,16 +69,23 @@ npm test          # run the unit test suite
 
 ## Desktop app (Windows installer, auto-updating)
 
-ClassBingo also ships as a real desktop program — a double-clickable
+BingoBash also ships as a real desktop program — a double-clickable
 installer, its own window (no browser needed), and it checks for updates
 every time it's launched, so a class computer never needs `git pull` again.
 
-**Installing it:** grab the latest `ClassBingo-Setup-x.y.z.exe` from the
+**Installing it:** grab the latest `BingoBash-Setup-x.y.z.exe` from the
 repo's [Releases page](https://github.com/Hayabusa015/ClassBingo/releases)
 and run it. Windows will likely show a **"Windows protected your PC"**
 SmartScreen warning the first time, since the installer isn't
 code-signed (that requires a paid certificate) — click **More info** →
 **Run anyway**. This only happens once per machine.
+
+> The app was renamed from ClassBingo to BingoBash at version 1.0.2. If
+> you already have ClassBingo installed, the auto-updater can't turn it
+> into BingoBash in place (Windows sees them as different programs) —
+> uninstall ClassBingo once, then install the BingoBash installer above.
+> Every update after that (BingoBash → BingoBash) goes smoothly through
+> the normal auto-update flow.
 
 **Getting updates:** every time the app opens, it quietly checks this
 repo's latest published release. If there's a newer version, it downloads
@@ -96,7 +103,7 @@ npm run release:patch   # 1.0.0 -> 1.0.1, tags it, pushes both
 
 — and `.github/workflows/release.yml` builds the Windows installer and
 publishes it to GitHub Releases automatically. Every installed copy of
-ClassBingo picks it up next time it's opened.
+BingoBash picks it up next time it's opened.
 
 **Building it locally** (Windows installers are built by CI on a real
 Windows runner, not needed day-to-day):

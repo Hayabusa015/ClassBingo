@@ -1,7 +1,7 @@
 {
-  "name": "classbingo",
+  "name": "bingobash",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A projector-friendly bingo caller and printable-card generator for science classrooms.",
   "author": "Matthew Shull",
   "type": "module",
@@ -37,8 +37,8 @@
     "wait-on": "^9.1.0"
   },
   "build": {
-    "appId": "com.shullscience.classbingo",
-    "productName": "ClassBingo",
+    "appId": "com.shullscience.bingobash",
+    "productName": "BingoBash",
     "files": [
       "dist/**/*",
       "electron/**/*",

@@ -64,7 +64,7 @@ function setupAutoUpdate(win) {
     if (!isPackaged) {
       dialog.showMessageBox(win, {
         type: 'info',
-        title: 'ClassBingo',
+        title: 'BingoBash',
         message: "Update checks only run in the installed app, not this dev copy.",
       });
       return { ok: false, reason: 'not-packaged' };
@@ -93,7 +93,7 @@ function setupAutoUpdate(win) {
       manualCheckInProgress = false;
       dialog.showMessageBox(win, {
         type: 'error',
-        title: 'ClassBingo',
+        title: 'BingoBash',
         message: "Couldn't check for updates.",
         detail: 'Check the internet connection and try again in a moment.',
       });
@@ -105,7 +105,7 @@ function setupAutoUpdate(win) {
       manualCheckInProgress = false;
       dialog.showMessageBox(win, {
         type: 'info',
-        title: 'ClassBingo',
+        title: 'BingoBash',
         message: "You're up to date!",
         detail: `Running the latest version (${info.version}).`,
       });
@@ -117,10 +117,10 @@ function setupAutoUpdate(win) {
     dialog
       .showMessageBox(win, {
         type: 'info',
-        title: 'ClassBingo update ready',
+        title: 'BingoBash update ready',
         message: `A new version (${info.version}) has been downloaded.`,
         detail:
-          'Restart ClassBingo now to finish updating, or keep going — it will finish installing next time the app is closed.',
+          'Restart BingoBash now to finish updating, or keep going — it will finish installing next time the app is closed.',
         buttons: ['Restart Now', 'Later'],
         defaultId: 0,
         cancelId: 1,

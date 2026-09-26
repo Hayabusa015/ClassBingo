@@ -26,7 +26,7 @@ export default function DeckPicker({ onPick, theme, onCycleTheme, resumeBanner }
         <ThemeToggle theme={theme} onCycle={onCycleTheme} />
       </div>
       <header className="home-header">
-        <h1>ClassBingo</h1>
+        <h1>BingoBash</h1>
         <p className="subtitle">Pick a game to call or print cards for.</p>
       </header>
 
