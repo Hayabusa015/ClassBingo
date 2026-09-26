@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { DeckConfig, DeckId } from '../data/types';
-import type { Theme } from '../lib/gameConfig';
+import type { GameMode, Theme } from '../lib/gameConfig';
+import { GAME_MODES, GAME_MODE_LABEL } from '../lib/gameConfig';
 import ThemeToggle from './ThemeToggle';
 import UpdateChecker from './UpdateChecker';
 import ScienceArt from './ScienceArt';
@@ -9,6 +10,8 @@ import ShullLogo from './ShullLogo';
 interface Props {
   decks: DeckConfig[];
   onPick: (deckId: DeckId) => void;
+  mode: GameMode;
+  onChangeMode: (mode: GameMode) => void;
   onCreate: (title?: string) => void;
   onExport: () => void;
   onImport: (file: File) => Promise<void>;
@@ -33,6 +36,8 @@ const SUBJECT_MARK: Record<string, string> = {
 export default function DeckPicker({
   decks,
   onPick,
+  mode,
+  onChangeMode,
   onCreate,
   onExport,
   onImport,
@@ -93,6 +98,19 @@ export default function DeckPicker({
             <p>
               {decks.length - savedCount} ready-made playsets · {savedCount} saved by you
             </p>
+          </div>
+          <div className="mode-tabs segmented" role="tablist" aria-label="Game mode">
+            {GAME_MODES.map((m) => (
+              <button
+                key={m}
+                role="tab"
+                aria-selected={mode === m}
+                className={`segmented-btn ${mode === m ? 'active' : ''}`}
+                onClick={() => onChangeMode(m)}
+              >
+                {GAME_MODE_LABEL[m]}
+              </button>
+            ))}
           </div>
           <button className="btn btn-primary" onClick={() => onCreate(query.trim().slice(0, 80))}>
             + Create playset
@@ -184,7 +202,7 @@ export default function DeckPicker({
                 <span className="deck-tile-footer">
                   <span className="deck-tile-count">{deck.items.length} items</span>
                   <span className="deck-launch">
-                    Customize <span aria-hidden="true">↗</span>
+                    {mode === 'memory' ? 'Play Memory' : 'Customize'} <span aria-hidden="true">↗</span>
                   </span>
                 </span>
               </button>

@@ -3,10 +3,11 @@ import { DECK_ORDER, getDeck, findDeck } from './data/decks';
 import type { DeckConfig, DeckId } from './data/types';
 import { getFilteredItems, type GameSettings } from './lib/cards';
 import type { WinPattern } from './lib/bingo';
-import type { CallStyle, SessionState, Theme, View } from './lib/gameConfig';
+import type { CallStyle, GameMode, SessionState, Theme, View } from './lib/gameConfig';
 import { SESSION_KEY, THEME_ORDER } from './lib/gameConfig';
 import { loadState, saveState, clearState } from './lib/storage';
 import { randomGameCode } from './lib/rng';
+import type { MemorySettings } from './lib/memory';
 import {
   readLibrary,
   writeLibrary,
@@ -21,6 +22,8 @@ import GameSetup from './components/GameSetup';
 import Caller from './components/Caller';
 import CardGenerator from './components/CardGenerator';
 import CustomPlayset from './components/CustomPlayset';
+import MemorySetup from './components/MemorySetup';
+import MemoryGame from './components/MemoryGame';
 
 function defaultSettingsFor(deck: DeckConfig): GameSettings {
   const count = getFilteredItems(deck, deck.defaultFilterId).length;
@@ -38,11 +41,15 @@ export default function App() {
   const [libraryState, setLibraryState] = useState(readLibrary);
   const library = libraryState.playsets;
   const [view, setView] = useState<View>('home');
+  const [libraryMode, setLibraryMode] = useState<GameMode>('bingo');
   const [creating, setCreating] = useState(false);
   const [creationTitle, setCreationTitle] = useState('');
   const [deckId, setDeckId] = useState<DeckId | null>(null);
   const [activeCustom, setActiveCustom] = useState<SavedPlayset | undefined>();
   const [settings, setSettings] = useState<GameSettings | null>(null);
+  const [memoryDeck, setMemoryDeck] = useState<DeckConfig | null>(null);
+  const [memoryActiveCustom, setMemoryActiveCustom] = useState<SavedPlayset | undefined>();
+  const [memorySettings, setMemorySettings] = useState<MemorySettings | null>(null);
   const [callStyle, setCallStyle] = useState<CallStyle>('both');
   const [winPattern, setWinPattern] = useState<WinPattern>('line');
   const [resumable, setResumable] = useState<SessionState | null>(null);
@@ -71,7 +78,7 @@ export default function App() {
   const cycleTheme = () => setTheme((t) => THEME_ORDER[(THEME_ORDER.indexOf(t) + 1) % THEME_ORDER.length]);
 
   useEffect(() => {
-    if (view === 'home' || !deckId || !settings) return;
+    if (!['setup', 'caller', 'cardgen'].includes(view) || !deckId || !settings) return;
     const session: SessionState = {
       view,
       deckId,
@@ -92,17 +99,28 @@ export default function App() {
     setView('setup');
     setCreating(false);
   };
+  const startMemory = (chosen: DeckConfig, saved?: SavedPlayset) => {
+    setMemoryDeck(chosen);
+    setMemoryActiveCustom(saved);
+    setMemorySettings(null);
+    setView('memory-setup');
+  };
   const handlePickDeck = (id: DeckId) => {
     const saved = library.find((entry) => entry.id === id);
     const chosen = saved ? playsetToDeck(saved) : findDeck(id);
-    if (chosen) startDeck(chosen, saved);
+    if (!chosen) return;
+    if (libraryMode === 'memory') startMemory(chosen, saved);
+    else startDeck(chosen, saved);
   };
-  const saveNew = (saved: SavedPlayset) => {
+  const persistNewPlayset = (saved: SavedPlayset) => {
     if (libraryState.error)
       throw new Error('Restore your library from an export before saving a new playset.');
     const next = [...library, saved];
     writeLibrary(next);
     setLibraryState({ playsets: next, error: null });
+  };
+  const saveNew = (saved: SavedPlayset) => {
+    persistNewPlayset(saved);
     startDeck(playsetToDeck(saved), saved);
   };
   const saveSelection = (title: string) => {
@@ -110,6 +128,18 @@ export default function App() {
     const items = getFilteredItems(deck, settings.filterId, settings.selectedItemIds);
     const source = activeCustom ? activeCustom.sourceDeckId : deck.id;
     saveNew(newPlayset(title, deck.subject || 'Science', items, source));
+  };
+  const saveMemorySelection = (title: string, filterId: string, selectedItemIds?: string[]) => {
+    if (!memoryDeck) return;
+    const items = getFilteredItems(memoryDeck, filterId, selectedItemIds);
+    const source = memoryActiveCustom ? memoryActiveCustom.sourceDeckId : memoryDeck.id;
+    persistNewPlayset(newPlayset(title, memoryDeck.subject || 'Science', items, source));
+  };
+  const exitMemory = () => {
+    setView('home');
+    setMemoryDeck(null);
+    setMemoryActiveCustom(undefined);
+    setMemorySettings(null);
   };
   const exportLibrary = () => {
     const blob = new Blob(
@@ -174,11 +204,39 @@ export default function App() {
 
   if (creating)
     return <CustomPlayset initialTitle={creationTitle} onSave={saveNew} onBack={() => setCreating(false)} />;
+  if (view === 'memory-setup' && memoryDeck)
+    return (
+      <MemorySetup
+        deck={memoryDeck}
+        onStart={(s) => {
+          setMemorySettings(s);
+          setView('memory-play');
+        }}
+        onBack={exitMemory}
+        onSaveSelection={saveMemorySelection}
+        theme={theme}
+        onCycleTheme={cycleTheme}
+      />
+    );
+  if (view === 'memory-play' && memoryDeck && memorySettings)
+    return (
+      <MemoryGame
+        deck={memoryDeck}
+        settings={memorySettings}
+        onReshuffle={setMemorySettings}
+        onChangeBoard={() => setView('memory-setup')}
+        onExit={exitMemory}
+        theme={theme}
+        onCycleTheme={cycleTheme}
+      />
+    );
   if (view === 'home' || !deck || !settings)
     return (
       <DeckPicker
         decks={decks}
         onPick={handlePickDeck}
+        mode={libraryMode}
+        onChangeMode={setLibraryMode}
         onCreate={(title = '') => {
           setCreationTitle(title);
           setCreating(true);
