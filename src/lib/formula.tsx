@@ -68,7 +68,11 @@ export function renderIon(formula: string, charge?: string): ReactNode[] {
  * as "SO4²⁻" instead of the raw "SO42-" stored in data.
  */
 export function renderDisplayText(deck: DeckConfig, item: BingoItem, text: string): ReactNode {
-  if (deck.id === 'ions' && item.formula && text === `${item.formula}${item.charge ?? ''}`) {
+  if (
+    (deck.presentation ?? deck.id) === 'ions' &&
+    item.formula &&
+    text === `${item.formula}${item.charge ?? ''}`
+  ) {
     return renderIon(item.formula, item.charge);
   }
   return text;

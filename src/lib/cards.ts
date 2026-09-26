@@ -11,6 +11,8 @@ export interface GameSettings {
   freeCenter: boolean;
   cardFace: CardFaceField;
   gameCode: string;
+  /** Omitted means the whole filter; an empty array means no selected items. */
+  selectedItemIds?: string[];
 }
 
 export interface CardCell {
@@ -21,9 +23,14 @@ export interface CardCell {
 
 export type CardGrid = CardCell[][];
 
-export function getFilteredItems(deck: DeckConfig, filterId: string): BingoItem[] {
+export function getFilteredItems(
+  deck: DeckConfig,
+  filterId: string,
+  selectedItemIds?: string[],
+): BingoItem[] {
   const filter = deck.filters.find((f) => f.id === filterId) ?? deck.filters[0];
-  return deck.items.filter(filter.predicate);
+  const selected = selectedItemIds ? new Set(selectedItemIds) : null;
+  return deck.items.filter((item) => filter.predicate(item) && (!selected || selected.has(item.id)));
 }
 
 /** Whether the grid has an active free center square. */
@@ -46,7 +53,16 @@ export function canGenerateCards(
 
 /** A stable string identifying every setting that changes what a card looks like. */
 export function settingsSignature(settings: GameSettings): string {
-  return [settings.deckId, settings.filterId, settings.gridSize, settings.freeCenter, settings.cardFace].join('|');
+  const base = [
+    settings.deckId,
+    settings.filterId,
+    settings.gridSize,
+    settings.freeCenter,
+    settings.cardFace,
+  ].join('|');
+  return settings.selectedItemIds === undefined
+    ? base
+    : `${base}|items:${JSON.stringify([...new Set(settings.selectedItemIds)].sort())}`;
 }
 
 /**
@@ -56,7 +72,7 @@ export function settingsSignature(settings: GameSettings): string {
  * can be regenerated from just its number and the game code stamped on it.
  */
 export function generateCard(deck: DeckConfig, settings: GameSettings, cardNumber: number): CardGrid {
-  const items = getFilteredItems(deck, settings.filterId);
+  const items = getFilteredItems(deck, settings.filterId, settings.selectedItemIds);
   const need = requiredItemCount(settings);
   if (items.length < need) {
     throw new Error(
@@ -93,7 +109,7 @@ export function generateCard(deck: DeckConfig, settings: GameSettings, cardNumbe
 
 /** Shuffled call order for the caller screen: every filtered item exactly once. */
 export function generateDrawOrder(deck: DeckConfig, settings: GameSettings): BingoItem[] {
-  const items = getFilteredItems(deck, settings.filterId);
+  const items = getFilteredItems(deck, settings.filterId, settings.selectedItemIds);
   const seed = `${settings.gameCode}|${settingsSignature(settings)}|draw`;
   return shuffle(items, createRng(seed));
 }

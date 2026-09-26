@@ -10,8 +10,8 @@ interface Props {
 }
 
 function secondaryText(deck: DeckConfig, item: BingoItem): ReactNode {
-  if (deck.id === 'elements') return item.symbol ?? '';
-  if (deck.id === 'ions') return renderIon(item.formula ?? '', item.charge);
+  if ((deck.presentation ?? deck.id) === 'elements') return item.symbol ?? '';
+  if ((deck.presentation ?? deck.id) === 'ions') return renderIon(item.formula ?? '', item.charge);
   return item.clue ?? '';
 }
 

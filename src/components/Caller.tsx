@@ -59,7 +59,15 @@ function setFullscreen(enter: boolean): void {
   }
 }
 
-export default function Caller({ deck, settings, callStyle, winPattern, onExit, theme, onCycleTheme }: Props) {
+export default function Caller({
+  deck,
+  settings,
+  callStyle,
+  winPattern,
+  onExit,
+  theme,
+  onCycleTheme,
+}: Props) {
   const drawOrder = useMemo(() => generateDrawOrder(deck, settings), [deck, settings]);
   const progressKey = useMemo(() => callerProgressKey(settings, deck.id), [settings, deck.id]);
 
@@ -108,7 +116,8 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
 
   const calledIdSet = useMemo(() => new Set(calledIds), [calledIds]);
   const remaining = drawOrder.length - calledIds.length;
-  const currentItem = peekItem ?? (calledIds.length > 0 ? (itemById.get(calledIds[calledIds.length - 1]) ?? null) : null);
+  const currentItem =
+    peekItem ?? (calledIds.length > 0 ? (itemById.get(calledIds[calledIds.length - 1]) ?? null) : null);
 
   const stopShuffleTimer = () => {
     if (animTimerRef.current !== null) {
@@ -219,13 +228,17 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
 
   useEffect(() => stopShuffleTimer, []);
 
-  const lastFive = [...calledIds]
+  // A clue must not disclose its answer through the history or a highlighted tile.
+  const publicCalledIds =
+    callStyle === 'challenge' && !revealed && !peekItem ? calledIds.slice(0, -1) : calledIds;
+  const publicCalledSet = new Set(publicCalledIds);
+  const lastFive = [...publicCalledIds]
     .slice(-5)
     .reverse()
     .map((id) => itemById.get(id))
     .filter((i): i is BingoItem => !!i);
 
-  const calledItemsInOrder = calledIds.map((id) => itemById.get(id)).filter((i): i is BingoItem => !!i);
+  const calledItemsInOrder = publicCalledIds.map((id) => itemById.get(id)).filter((i): i is BingoItem => !!i);
 
   return (
     <div className={`page page-caller ${bingoMode ? 'bingo-mode' : ''}`}>
@@ -246,7 +259,11 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
           >
             {bingoMode ? '✕ Exit Bingo Mode' : '🖥 Bingo Mode'}
           </button>
-          <button className="btn btn-ghost icon-btn" onClick={() => setSoundOn((s) => !s)} title="Toggle sound (M)">
+          <button
+            className="btn btn-ghost icon-btn"
+            onClick={() => setSoundOn((s) => !s)}
+            title="Toggle sound (M)"
+          >
             {soundOn ? '🔊' : '🔇'}
           </button>
           <ThemeToggle theme={theme} onCycle={onCycleTheme} />
@@ -259,6 +276,18 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
       <div className="caller-counter">
         Call {calledIds.length} of {drawOrder.length}
         {remaining === 0 && <span className="caller-done-badge"> — all items called!</span>}
+        <div
+          className="call-progress"
+          role="progressbar"
+          aria-label="Items called"
+          aria-valuemin={0}
+          aria-valuemax={drawOrder.length}
+          aria-valuenow={calledIds.length}
+        >
+          <span
+            style={{ transform: `scaleX(${drawOrder.length ? calledIds.length / drawOrder.length : 0})` }}
+          />
+        </div>
       </div>
 
       <div className="caller-main">
@@ -293,10 +322,18 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
           </div>
 
           <div className="caller-controls">
-            <button className="btn btn-primary btn-lg" onClick={handleNext} disabled={remaining === 0 || isAnimating}>
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={handleNext}
+              disabled={remaining === 0 || isAnimating}
+            >
               Next ▶ (Space)
             </button>
-            <button className="btn btn-secondary" onClick={handleUndo} disabled={calledIds.length === 0 || isAnimating}>
+            <button
+              className="btn btn-secondary"
+              onClick={handleUndo}
+              disabled={calledIds.length === 0 || isAnimating}
+            >
               Undo ⟲ (Backspace)
             </button>
             <label className="auto-call-toggle">
@@ -332,8 +369,16 @@ export default function Caller({ deck, settings, callStyle, winPattern, onExit, 
 
         <aside className="caller-sidebar">
           <CalledList deck={deck} calledItems={calledItemsInOrder} />
-          {!bingoMode && <CalledBoard deck={deck} items={drawOrder} calledIds={calledIdSet} onPeek={setPeekItem} />}
-          <WinnerCheck deck={deck} settings={settings} calledIds={calledIdSet} winPattern={winPattern} onWin={handleWin} />
+          {(!bingoMode || (deck.presentation ?? deck.id) === 'elements') && (
+            <CalledBoard deck={deck} items={drawOrder} calledIds={publicCalledSet} onPeek={setPeekItem} />
+          )}
+          <WinnerCheck
+            deck={deck}
+            settings={settings}
+            calledIds={calledIdSet}
+            winPattern={winPattern}
+            onWin={handleWin}
+          />
         </aside>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { WIN_PATTERNS, type WinPattern } from '../lib/bingo';
 import type { CallStyle, Theme } from '../lib/gameConfig';
 import { randomGameCode } from '../lib/rng';
 import ThemeToggle from './ThemeToggle';
+import ItemPicker from './ItemPicker';
 
 interface Props {
   deck: DeckConfig;
@@ -19,6 +20,7 @@ interface Props {
   onBack: () => void;
   theme: Theme;
   onCycleTheme: () => void;
+  onSaveSelection: (title: string) => void;
 }
 
 const GRID_SIZES: GridSize[] = [3, 4, 5];
@@ -36,8 +38,9 @@ export default function GameSetup({
   onBack,
   theme,
   onCycleTheme,
+  onSaveSelection,
 }: Props) {
-  const itemCount = getFilteredItems(deck, settings.filterId).length;
+  const itemCount = getFilteredItems(deck, settings.filterId, settings.selectedItemIds).length;
   const need = requiredItemCount(settings);
   const canGenerate = canGenerateCards(itemCount, settings);
   const showFreeCenterOption = settings.gridSize % 2 === 1;
@@ -64,7 +67,7 @@ export default function GameSetup({
                   type="radio"
                   name="filter"
                   checked={settings.filterId === f.id}
-                  onChange={() => update({ filterId: f.id })}
+                  onChange={() => update({ filterId: f.id, selectedItemIds: undefined })}
                 />
                 <span>{f.label}</span>
                 <span className="option-count">{deck.items.filter(f.predicate).length}</span>
@@ -138,11 +141,18 @@ export default function GameSetup({
               <button
                 className={`segmented-btn ${callStyle === 'challenge' ? 'active' : ''}`}
                 onClick={() => onChangeCallStyle('challenge')}
+                disabled={deck.supportsChallenge === false}
               >
                 Challenge (reveal on demand)
               </button>
             </div>
           </div>
+
+          {deck.supportsChallenge === false && (
+            <p className="hint">
+              Challenge mode needs a clue for every item. Use Show both for an answer-only playset.
+            </p>
+          )}
 
           <div className="option-row">
             <span className="option-label">Win pattern</span>
@@ -178,6 +188,14 @@ export default function GameSetup({
           </div>
         </section>
       </div>
+
+      <ItemPicker
+        key={deck.id}
+        deck={deck}
+        settings={settings}
+        onChange={onChangeSettings}
+        onSave={onSaveSelection}
+      />
 
       <div className="setup-actions">
         <button className="btn btn-primary btn-lg" disabled={!canGenerate} onClick={onStartCaller}>

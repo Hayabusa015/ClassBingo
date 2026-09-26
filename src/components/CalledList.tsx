@@ -8,9 +8,10 @@ interface Props {
 }
 
 function secondaryBadge(deck: DeckConfig, item: BingoItem) {
-  if (deck.id === 'elements') return item.symbol;
-  if (deck.id === 'ions') return item.formula ? renderIon(item.formula, item.charge) : null;
-  if (deck.id === 'minerals') return item.formula ?? null;
+  if ((deck.presentation ?? deck.id) === 'elements') return item.symbol;
+  if ((deck.presentation ?? deck.id) === 'ions')
+    return item.formula ? renderIon(item.formula, item.charge) : null;
+  if ((deck.presentation ?? deck.id) === 'minerals') return item.formula ?? null;
   return null;
 }
 

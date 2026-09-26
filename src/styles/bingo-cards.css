@@ -1,0 +1,203 @@
+/* The card is its own sizing context: type scales with 1, 2, or 4-up layouts. */
+.bingo-card {
+  container-type: inline-size;
+  min-width: 0;
+  position: relative;
+  border-radius: 18px;
+  padding: 20px;
+  gap: 14px;
+  font-family: var(--font-body);
+  --card-ink: var(--text);
+  --card-muted: var(--text-dim);
+  --card-line: var(--border-strong);
+  --card-accent: var(--accent);
+  --card-fill: var(--bg-tile);
+  color: var(--card-ink);
+}
+.bingo-card-edition {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--card-muted);
+  font-size: clamp(7px, 1.7cqw, 11px);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--card-line);
+}
+.bingo-card-edition > span:last-child { text-align: right; letter-spacing: .04em; }
+.bingo-card .printable-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+}
+.bingo-card-heading { min-width: 0; }
+.bingo-card .printable-card-header h2 {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 4.1cqw, 30px);
+  line-height: 1.12;
+  letter-spacing: -.045em;
+  font-weight: 850;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.bingo-card .printable-card-classline {
+  font-size: clamp(8px, 2cqw, 13px);
+  color: var(--card-muted);
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.bingo-card-number {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid var(--card-line);
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.bingo-card-number > span { font-size: clamp(6px, 1.5cqw, 9px); letter-spacing: .16em; color: var(--card-muted); }
+.bingo-card-number strong { font-size: clamp(17px, 4.7cqw, 32px); letter-spacing: -.05em; line-height: 1.15; }
+.bingo-letter-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.bingo-letter-strip span {
+  display: grid;
+  place-items: center;
+  border-block: 1px solid var(--card-line);
+  font-size: clamp(20px, 7.5cqw, 52px);
+  line-height: 1.25;
+  font-weight: 900;
+  letter-spacing: -.05em;
+  color: var(--card-accent);
+}
+.bingo-card .printable-card-grid { gap: 6px; }
+.bingo-card .printable-cell {
+  position: relative;
+  min-width: 0;
+  padding: 15% 5% 8%;
+  border: 1px solid var(--card-line);
+  border-radius: 9px;
+  background: var(--card-fill);
+  flex-direction: column;
+  gap: 2px;
+  color: var(--card-ink);
+}
+.cell-coordinate {
+  position: absolute;
+  top: 5%;
+  left: 8%;
+  font-size: clamp(5px, 1.5cqw, 10px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--card-muted);
+  opacity: .7;
+}
+.bingo-card .printable-cell-text {
+  font-size: clamp(8px, 2.6cqw, 20px);
+  line-height: 1.2;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.bingo-card .short-face .printable-cell-text { font-size: clamp(13px, 5.5cqw, 40px); font-weight: 800; letter-spacing: -.04em; }
+.bingo-card .long-word .printable-cell-text { font-size: clamp(7px, 2.25cqw, 18px); letter-spacing: -.025em; }
+.bingo-card .printable-cell-text sub, .bingo-card .printable-cell-text sup { font-size: .65em; }
+.bingo-card .printable-cell.free {
+  border: 2px solid var(--card-accent);
+  padding: 5%;
+  color: var(--card-accent);
+  font-style: normal;
+}
+.free-space-emblem { width: 42%; max-height: 45%; flex-shrink: 0; }
+.bingo-card .free .printable-cell-text { font-size: clamp(8px, 2.5cqw, 18px); font-weight: 850; letter-spacing: .12em; }
+.bingo-card .printable-card-footer {
+  align-items: center;
+  gap: 14px;
+  color: var(--card-muted);
+  font-size: clamp(7px, 1.8cqw, 12px);
+  letter-spacing: .06em;
+  border-top: 1px solid var(--card-line);
+  padding-top: 12px;
+  margin-top: auto;
+}
+.bingo-card .printable-card-meta { white-space: nowrap; }
+.bingo-card .printable-card-meta strong { color: var(--card-ink); letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+.bingo-card-signoff { letter-spacing: 0; }
+
+@media screen {
+  .card-preview-toolbar {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    gap: 16px; max-width: 1000px; margin: 32px auto 24px; padding: 0 20px;
+  }
+  .card-preview-toolbar > div:first-child { display: flex; flex-direction: column; gap: 5px; }
+  .card-preview-toolbar strong { font-size: 1.05rem; }
+  .card-preview-toolbar span, .card-preview-toolbar p { color: var(--text-dim); font-size: .8rem; }
+  .card-preview-toolbar p { flex-basis: 100%; margin: 0; }
+  .cardgen-view-toggle { flex-wrap: wrap; }
+  .print-page { max-width: 1000px; gap: 28px; }
+  .cards-per-page-1 { max-width: 740px; }
+  .bingo-card {
+    border-color: var(--accent-line);
+    background: linear-gradient(145deg, var(--accent-soft), transparent 35%), var(--bg-card);
+    box-shadow: 0 16px 44px color-mix(in srgb, var(--bg) 75%, transparent), 0 0 24px var(--accent-soft), inset 0 1px 0 color-mix(in srgb, var(--text) 15%, transparent);
+    border-top: 3px solid var(--accent);
+  }
+  .bingo-card-number { color: var(--accent-strong); background: var(--accent-soft); border-color: var(--accent-line); }
+  .bingo-letter-strip span {
+    background: linear-gradient(180deg, var(--accent-soft), transparent);
+    border-radius: 8px;
+    border-color: var(--accent-line);
+    text-shadow: 0 0 22px var(--accent-soft);
+  }
+  .bingo-card .printable-cell { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 5%, transparent); transition: border-color .2s ease, background .2s ease; }
+  .bingo-card .printable-cell:hover { border-color: var(--accent); }
+  .bingo-card .printable-cell.free { background: var(--accent-soft); box-shadow: inset 0 0 22px var(--accent-soft), 0 0 16px var(--accent-soft); }
+  .free-space-emblem { filter: drop-shadow(0 0 6px var(--accent-soft)); }
+  .card-preview-paper .bingo-card {
+    --card-ink: #161b24; --card-muted: #515763; --card-line: #8e949c;
+    --card-accent: #161b24; --card-fill: #fff;
+    background: #fff; border-color: #161b24; box-shadow: 0 12px 30px #0003;
+  }
+  .card-preview-paper .bingo-card-number, .card-preview-paper .bingo-letter-strip span,
+  .card-preview-paper .bingo-card .printable-cell.free {
+    background: #fff; border-color: var(--card-line); color: var(--card-ink); box-shadow: none; text-shadow: none;
+  }
+  .card-preview-paper .free-space-emblem { filter: none; }
+  @media (max-width: 650px) {
+    .print-page { grid-template-columns: minmax(0, 1fr) !important; padding: 0; }
+    .bingo-card { padding: 16px; gap: 10px; }
+    .card-preview-toolbar { padding: 0; }
+  }
+}
+
+@media print {
+  .print-page { gap: .18in; }
+  .bingo-card {
+    --card-ink: #000; --card-muted: #333; --card-line: #444;
+    --card-accent: #000; --card-fill: #fff;
+    padding: .12in; gap: .07in; border: 1.5pt solid #000; border-radius: .12in;
+  }
+  .bingo-card-edition { padding-bottom: .04in; font-size: 6pt; gap: .06in; }
+  .bingo-card-number { padding: .03in .07in; border-radius: .06in; }
+  .bingo-card .printable-card-header { gap: .08in; }
+  .bingo-card .printable-card-header h2 { font-size: clamp(11pt, 3.8cqw, 23pt); }
+  .bingo-card .printable-card-classline { margin-top: .03in; font-size: 7pt; }
+  .bingo-card .printable-card-grid, .bingo-letter-strip { gap: .035in; }
+  .bingo-card .printable-cell { border-radius: .045in; }
+  .bingo-card .printable-cell.free { background: #fff !important; color: #000 !important; border-width: 1.5pt; }
+  .bingo-card .printable-cell-text { font-size: clamp(6.5pt, 2.65cqw, 15pt); }
+  .bingo-card .short-face .printable-cell-text { font-size: clamp(10pt, 5.5cqw, 30pt); }
+  .bingo-card .long-word .printable-cell-text { font-size: clamp(6pt, 2.25cqw, 13pt); }
+  .bingo-card .free .printable-cell-text { font-size: clamp(7pt, 2.5cqw, 15pt); }
+  .bingo-card .printable-card-footer { padding-top: .06in; font-size: 6.5pt; gap: .07in; }
+  .cards-per-page-4 .bingo-card { gap: .045in; }
+  .cards-per-page-4 .printable-cell { aspect-ratio: 1.18; }
+  .cards-per-page-4 .bingo-letter-strip span { font-size: 17pt; }
+  .cards-per-page-4 .printable-card-header h2 { font-size: 10pt; }
+  .cards-per-page-4 .bingo-card-number strong { font-size: 16pt; }
+}

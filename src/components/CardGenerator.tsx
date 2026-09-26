@@ -33,10 +33,13 @@ export default function CardGenerator({ deck, settings, onExit, onStartCaller, t
   const [cardsPerPage, setCardsPerPage] = useState<number>(cardsPerPageOptions(settings.gridSize)[0]);
   const [headerTitle, setHeaderTitle] = useState(defaultTitle);
   const [classLine, setClassLine] = useState('');
-  const [showNameBlank, setShowNameBlank] = useState(true);
   const [view, setView] = useState<ViewMode>('cards');
+  const [paperPreview, setPaperPreview] = useState(false);
 
-  const filteredItems = useMemo(() => getFilteredItems(deck, settings.filterId), [deck, settings.filterId]);
+  const filteredItems = useMemo(
+    () => getFilteredItems(deck, settings.filterId, settings.selectedItemIds),
+    [deck, settings.filterId, settings.selectedItemIds],
+  );
 
   const cardNumbers = useMemo(() => Array.from({ length: numCards }, (_, i) => i + 1), [numCards]);
   const pages = useMemo(() => chunk(cardNumbers, cardsPerPage), [cardNumbers, cardsPerPage]);
@@ -86,7 +89,11 @@ export default function CardGenerator({ deck, settings, onExit, onStartCaller, t
 
         <label className="option-row">
           <span className="option-label">Header title</span>
-          <input className="text-input" value={headerTitle} onChange={(e) => setHeaderTitle(e.target.value)} />
+          <input
+            className="text-input"
+            value={headerTitle}
+            onChange={(e) => setHeaderTitle(e.target.value)}
+          />
         </label>
 
         <label className="option-row">
@@ -99,13 +106,11 @@ export default function CardGenerator({ deck, settings, onExit, onStartCaller, t
           />
         </label>
 
-        <label className="option-checkbox">
-          <input type="checkbox" checked={showNameBlank} onChange={(e) => setShowNameBlank(e.target.checked)} />
-          <span>Include a name blank</span>
-        </label>
-
         <div className="cardgen-view-toggle">
-          <button className={`btn ${view === 'cards' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setView('cards')}>
+          <button
+            className={`btn ${view === 'cards' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setView('cards')}
+          >
             View Cards
           </button>
           <button
@@ -120,16 +125,42 @@ export default function CardGenerator({ deck, settings, onExit, onStartCaller, t
         </div>
 
         <p className="hint">
-          Use your browser's Print dialog and choose "Save as PDF" if you want a PDF file instead of printing directly.
+          Use your browser's Print dialog and choose "Save as PDF" if you want a PDF file instead of printing
+          directly.
         </p>
       </div>
 
-      <div className="printable-root">
+      {view === 'cards' && (
+        <div className="card-preview-toolbar no-print">
+          <div>
+            <strong>Your classroom set</strong>
+            <span>{numCards} cards · Same game, different boards</span>
+          </div>
+          <div className="segmented" aria-label="Card preview appearance">
+            <button
+              className={`segmented-btn ${!paperPreview ? 'active' : ''}`}
+              aria-pressed={!paperPreview}
+              onClick={() => setPaperPreview(false)}
+            >
+              Glow preview
+            </button>
+            <button
+              className={`segmented-btn ${paperPreview ? 'active' : ''}`}
+              aria-pressed={paperPreview}
+              onClick={() => setPaperPreview(true)}
+            >
+              Paper preview
+            </button>
+          </div>
+          <p>Prints with crisp black outlines on white paper.</p>
+        </div>
+      )}
+      <div className={`printable-root ${paperPreview ? 'card-preview-paper' : ''}`}>
         {view === 'cards' ? (
           pages.map((pageNumbers, pageIndex) => (
             <div
               key={pageIndex}
-              className="print-page"
+              className={`print-page cards-per-page-${cardsPerPage}`}
               style={{ gridTemplateColumns: `repeat(${Math.min(cardsPerPage, 2)}, 1fr)` }}
             >
               <div className="print-page-label no-print">Page {pageIndex + 1}</div>
@@ -142,14 +173,18 @@ export default function CardGenerator({ deck, settings, onExit, onStartCaller, t
                   gameCode={settings.gameCode}
                   headerTitle={headerTitle}
                   classLine={classLine}
-                  showNameBlank={showNameBlank}
                 />
               ))}
             </div>
           ))
         ) : (
           <div className="print-page call-sheet-page">
-            <CallSheet deck={deck} items={filteredItems} gameCode={settings.gameCode} headerTitle={headerTitle} />
+            <CallSheet
+              deck={deck}
+              items={filteredItems}
+              gameCode={settings.gameCode}
+              headerTitle={headerTitle}
+            />
           </div>
         )}
       </div>

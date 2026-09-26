@@ -1,6 +1,7 @@
 import type { GameSettings } from './cards';
 import type { WinPattern } from './bingo';
 import type { DeckId } from '../data/types';
+import type { SavedPlayset } from './playsets';
 
 /** 'both' shows name+symbol/formula together; 'challenge' shows only the side not on student cards. */
 export type CallStyle = 'both' | 'challenge';
@@ -22,8 +23,9 @@ export interface SessionState {
   settings: GameSettings;
   callStyle: CallStyle;
   winPattern: WinPattern;
+  customPlayset?: SavedPlayset;
 }
 
 export const SESSION_KEY = 'session';
 export const callerProgressKey = (settings: GameSettings, deckId: DeckId): string =>
-  `caller:${deckId}:${settings.filterId}:${settings.gridSize}:${settings.freeCenter}:${settings.gameCode}`;
+  `caller:${deckId}:${settings.filterId}:${settings.gridSize}:${settings.freeCenter}:${settings.gameCode}${settings.selectedItemIds === undefined ? '' : `:items:${JSON.stringify([...new Set(settings.selectedItemIds)].sort())}`}`;

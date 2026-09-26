@@ -1,4 +1,5 @@
-export type DeckId = 'elements' | 'ions' | 'minerals' | 'rocks';
+export type ScienceDeckId = 'elements' | 'ions' | 'minerals' | 'rocks';
+export type DeckId = ScienceDeckId | `curriculum:${string}` | `custom:${string}`;
 
 export interface BingoItem {
   /** Stable id, e.g. "el-11", "ion-sulfate", "min-quartz", "rock-granite" */
@@ -35,6 +36,11 @@ export interface CardFaceOption {
 
 export interface DeckConfig {
   id: DeckId;
+  /** Rendering identity survives saving a selection as a custom playset. */
+  presentation?: ScienceDeckId;
+  subject?: string;
+  grades?: string;
+  supportsChallenge?: boolean;
   title: string;
   shortTitle: string;
   description: string;

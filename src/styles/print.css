@@ -22,10 +22,18 @@
   }
 
   .printable-root {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: static;
     width: 100%;
+  }
+
+  /* Keep the printable subtree in normal flow for browser pagination. */
+  #root,
+  .page-cardgen {
+    visibility: visible;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    max-width: none;
   }
 
   .no-print {

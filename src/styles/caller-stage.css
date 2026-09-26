@@ -1,0 +1,116 @@
+/* The live periodic-table stage. Draw order and timing remain in Caller. */
+@media screen {
+  .shull-logo { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; border-radius: 50%; }
+  .home-header > .shull-logo { width: 100px; margin: 0 auto 20px; box-shadow: 0 0 28px var(--accent-soft); }
+  .element-reverse .shull-logo, .element-draw-back .shull-logo { width: 65%; height: auto; margin-bottom: 4px; }
+  .call-card.periodic-stage {
+    --tile-size: min(390px, 88%);
+    min-height: 590px;
+    padding: 28px 20px;
+    gap: 24px;
+    perspective: 1400px;
+    background: radial-gradient(ellipse at 50% 55%, var(--accent-soft), transparent 68%), var(--bg-elevated);
+    isolation: isolate;
+  }
+  .call-card.periodic-stage.call-card-landed { animation: none; }
+  .periodic-stage .stage-label { letter-spacing: .24em; font-size: .68rem; }
+  .stage-caption { font-size: .78rem; color: var(--text-dim); text-wrap: balance; }
+  .element-reveal { width: var(--tile-size); aspect-ratio: 1; position: relative; flex-shrink: 0; perspective: 1400px; }
+  .element-guessing { color: var(--accent); }
+  .element-aura {
+    position: absolute; inset: -15%; z-index: -1; border-radius: 50%;
+    background: radial-gradient(ellipse, color-mix(in srgb, currentColor 23%, transparent), transparent 68%);
+    animation: element-bloom 1.5s ease-out both;
+    pointer-events: none;
+  }
+  .element-flipper {
+    position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
+    animation: element-flip-in .85s cubic-bezier(.16, 1, .3, 1) both;
+  }
+  .periodic-face, .element-reverse, .element-draw-back, .draw-echo {
+    position: absolute; inset: 0; border-radius: 24px; border: 2px solid currentColor;
+    background: var(--bg-card); backface-visibility: hidden;
+  }
+  .periodic-face {
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 24px 28px 20px; overflow: hidden;
+    background:
+      linear-gradient(130deg, color-mix(in srgb, currentColor 12%, transparent), transparent 48%),
+      linear-gradient(310deg, color-mix(in srgb, currentColor 7%, transparent), transparent 40%), var(--bg-card);
+    box-shadow: 0 0 0 5px color-mix(in srgb, currentColor 7%, transparent),
+      0 0 42px color-mix(in srgb, currentColor 22%, transparent),
+      inset 0 0 30px color-mix(in srgb, currentColor 7%, transparent), 0 24px 48px color-mix(in srgb, var(--bg) 80%, transparent);
+  }
+  .periodic-face::before {
+    content: ''; position: absolute; inset: -60% -100%; pointer-events: none;
+    background: linear-gradient(115deg, transparent 40%, color-mix(in srgb, var(--text) 22%, transparent) 49%, transparent 58%);
+    animation: element-light-sweep 1.2s .35s ease-out both;
+  }
+  .periodic-face::after {
+    content: ''; position: absolute; inset: 7px; border: 1px solid currentColor;
+    opacity: .16; border-radius: 17px; pointer-events: none;
+  }
+  .periodic-topline { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+  .periodic-number { display: flex; flex-direction: column; align-items: start; gap: 3px; }
+  .periodic-number > span { font-size: .52rem; letter-spacing: .14em; color: var(--text-dim); }
+  .periodic-number strong { font-size: 2.2rem; font-weight: 750; line-height: 1; font-variant-numeric: tabular-nums; }
+  .periodic-category { max-width: 60%; text-align: right; font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; line-height: 1.5; padding: 5px 9px; border: 1px solid color-mix(in srgb, currentColor 28%, transparent); border-radius: 5px; }
+  .periodic-identity { display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; animation: identity-resolve .6s ease-out both; }
+  .periodic-symbol { font-size: clamp(6rem, 10vw, 8.5rem); font-weight: 800; letter-spacing: -.075em; line-height: .95; padding-right: .075em; text-shadow: 0 0 35px color-mix(in srgb, currentColor 25%, transparent); }
+  .periodic-name { font-size: clamp(1.3rem, 2.5vw, 2.05rem); font-weight: 600; line-height: 1.15; letter-spacing: -.025em; color: var(--text); overflow-wrap: anywhere; }
+  .periodic-name.answer-hidden { color: var(--text-dim); font-size: 1.15rem; font-weight: 450; }
+  .periodic-mass { display: flex; flex-direction: column; gap: 5px; border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent); padding-top: 12px; }
+  .periodic-mass strong { font-size: 1.5rem; font-weight: 550; letter-spacing: .045em; font-variant-numeric: tabular-nums; color: var(--text); }
+  .periodic-mass > span { font-size: .52rem; font-weight: 600; letter-spacing: .2em; color: var(--text-dim); }
+  .element-reverse { transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; flex-direction: column; background: var(--bg-card); }
+  .element-reverse .science-art { width: 80%; height: 65%; color: inherit; }
+  .element-reverse > span { font-size: .9rem; font-weight: 750; letter-spacing: .22em; }
+  .element-draw-stack { width: var(--tile-size); aspect-ratio: 1; position: relative; color: var(--accent); perspective: 1400px; }
+  .element-draw-back { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; backface-visibility: visible; animation: element-shuffle 1.3s ease-in-out infinite; box-shadow: 0 0 40px var(--accent-soft); background: radial-gradient(ellipse at 50% 40%, var(--accent-soft), transparent 70%), var(--bg-card); }
+  .element-draw-back .science-art { width: 85%; height: 56%; }
+  .element-draw-back strong { font-size: 1.15rem; letter-spacing: .16em; }
+  .element-draw-back > span { font-size: .58rem; letter-spacing: .24em; color: var(--text-dim); }
+  .draw-echo { opacity: .25; transform: translate(-13px, 5px) rotate(-5deg); }
+  .draw-echo-two { transform: translate(13px, 5px) rotate(5deg); opacity: .15; }
+  .called-board-grid.deck-elements .called-tile { position: relative; padding: 16px 4px 7px; min-height: 51px; font-size: .9rem; }
+  .called-board-grid.deck-elements { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); max-height: 390px; }
+  .called-atomic-number { position: absolute; top: 4px; left: 6px; font-size: .53rem; font-weight: 450; opacity: .8; }
+  .bingo-mode .call-card.periodic-stage { --tile-size: min(470px, 84%); min-height: 600px; flex: 0 0 auto; gap: 24px; }
+  .bingo-mode .periodic-symbol { font-size: clamp(7rem, 12vw, 10rem); }
+  .bingo-mode .periodic-name { font-size: clamp(1.6rem, 2.5vw, 2.5rem); }
+  .bingo-mode .called-board-grid.deck-elements { max-height: 340px; }
+  .bingo-mode .caller-sidebar .called-list-items { max-height: 180px; }
+  .bingo-mode .caller-call-area:has(.periodic-stage) { height: auto; }
+  :root[data-theme='contrast'] .periodic-face { box-shadow: none; background: var(--bg-card); }
+  :root[data-theme='contrast'] .element-aura, :root[data-theme='contrast'] .periodic-face::before { display: none; }
+  :root[data-theme='contrast'] .element-reveal { color: var(--accent); }
+  @media (max-width: 600px) {
+    .call-card.periodic-stage, .bingo-mode .call-card.periodic-stage { --tile-size: min(330px, 92%); min-height: 460px; padding: 24px 10px; gap: 22px; }
+    .periodic-face { padding: 18px 18px 14px; border-radius: 18px; }
+    .periodic-topline { gap: 10px; }
+    .periodic-number strong { font-size: 1.65rem; }
+    .periodic-category { font-size: .52rem; padding: 4px 6px; }
+    .periodic-symbol, .bingo-mode .periodic-symbol { font-size: 6rem; }
+    .periodic-name, .bingo-mode .periodic-name { font-size: 1.4rem; }
+    .periodic-mass { padding-top: 8px; }
+    .periodic-mass strong { font-size: 1.2rem; }
+    .stage-caption { font-size: .7rem; }
+  }
+}
+@keyframes element-flip-in {
+  0% { transform: rotateY(-180deg) rotateZ(-6deg) scale(.86); }
+  68% { transform: rotateY(8deg) rotateZ(1deg) scale(1.025); }
+  100% { transform: rotateY(0) rotateZ(0) scale(1); }
+}
+@keyframes element-light-sweep { from { transform: translateX(-35%); opacity: 0; } 20% { opacity: 1; } to { transform: translateX(40%); opacity: 0; } }
+@keyframes element-bloom { from { transform: scale(.65); opacity: 0; } 50% { transform: scale(1.15); opacity: 1; } to { transform: scale(1); opacity: .75; } }
+@keyframes identity-resolve { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes element-shuffle {
+  0%, 100% { transform: rotateY(-16deg) rotateZ(-3deg) translateY(0); }
+  40% { transform: rotateY(34deg) rotateZ(3deg) translateY(-12px); }
+  75% { transform: rotateY(-28deg) rotateZ(-2deg) translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .element-flipper, .periodic-identity, .element-draw-back, .element-aura { animation: none; transform: none; }
+  .periodic-face::before, .draw-echo { display: none; }
+}
