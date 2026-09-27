@@ -1,7 +1,7 @@
 import ThemeToggle from './ThemeToggle';
 import type { Theme } from '../lib/gameConfig';
 
-const LAST_UPDATED = 'September 27, 2026';
+const LAST_UPDATED = 'September 28, 2026';
 const CONTACT_EMAIL = 'm.shull15@gmail.com';
 
 interface Props {
@@ -35,9 +35,9 @@ function PrivacyPolicy() {
   return (
     <>
       <p>
-        StudyArcade is a free set of classroom review games — Bingo, Memory, and live Jeopardy — built and
-        maintained independently by a classroom science teacher. This page explains, plainly, what data the
-        app touches and why.
+        StudyArcade is a free set of classroom review games — Bingo, Memory, live Jeopardy, and GLITCH — built
+        and maintained independently by a classroom science teacher. This page explains, plainly, what data
+        the app touches and why.
       </p>
 
       <h2>The short version</h2>
@@ -48,9 +48,9 @@ function PrivacyPolicy() {
           browser's local storage) and are never uploaded anywhere.
         </li>
         <li>
-          The only feature that sends anything to a server is <strong>live Jeopardy</strong>: hosting or
-          joining a game sends the board content and each player's first name to our database so the game
-          can sync in real time.
+          The only features that send anything to a server are the two <strong>live, multi-device games</strong>
+          — Jeopardy and GLITCH: hosting or joining one sends the board or question content and each player's
+          first name to our database so the game can sync in real time.
         </li>
         <li>We don't use analytics, advertising, or tracking scripts of any kind.</li>
       </ul>
@@ -73,14 +73,26 @@ function PrivacyPolicy() {
           buzz-in and Final Jeopardy activity (which clue, when, and whether it was marked correct).</li>
         <li>Wager amounts and typed answers submitted for Daily Double and Final Jeopardy.</li>
       </ul>
+      <h3>Only when you host or join a live GLITCH game</h3>
+      <p>GLITCH works the same way: the following is sent to the same database, only for the duration of that
+        one game:</p>
+      <ul>
+        <li>The game code, title, and the review questions built from the playset the host chose.</li>
+        <li>For each player who joins: the first name they type to join, an anonymous "emblem" (a shape and
+          color used to tell players apart on screen), whether each answer was correct, and their charge
+          count.</li>
+        <li>In game modes with hidden roles (not yet available), each player's secret role and any votes cast
+          — these are never readable by other players' devices, only used to run the round.</li>
+      </ul>
       <p>
         We do not ask for — and the app has no field for — last names, emails, birthdates, or any other
-        contact or identifying information. This data exists only to run that one game session.
+        contact or identifying information, in either game. This data exists only to run that one game
+        session.
       </p>
       <p>
-        <strong>Retention:</strong> a live game's data is automatically and permanently deleted from our
-        database 7 days after it was created, whether or not the host formally ended it. Until then, you can
-        email us (below) to request early deletion of a specific game.
+        <strong>Retention:</strong> a live game's data (Jeopardy or GLITCH) is automatically and permanently
+        deleted from our database 7 days after it was created, whether or not the host formally ended it.
+        Until then, you can email us (below) to request early deletion of a specific game.
       </p>
 
       <h2>What we don't do</h2>
@@ -96,8 +108,8 @@ function PrivacyPolicy() {
       <ul>
         <li><strong>Vercel</strong> — hosts the website and, like any host, automatically logs basic request
           data (IP address, timestamps) for security and reliability.</li>
-        <li><strong>Supabase</strong> — hosts the database used only for live Jeopardy games, described
-          above.</li>
+        <li><strong>Supabase</strong> — hosts the database used only for live Jeopardy and GLITCH games,
+          described above.</li>
         <li><strong>Google Fonts</strong> — the arcade display font is loaded from Google's font service,
           which may see your IP address as part of that request, per Google's own privacy policy.</li>
         <li><strong>GitHub</strong> — the optional desktop app checks GitHub Releases for newer versions; this
@@ -109,19 +121,19 @@ function PrivacyPolicy() {
       <p>
         StudyArcade is meant to be used under a teacher's direction as part of a lesson, not signed up for
         directly by students. The only information a student ever enters is a first name, to join a live
-        Jeopardy game their teacher is hosting — never an email address or other contact information.
-        StudyArcade is not directed at children as a consumer product, and it is the responsibility of the
-        teacher using the app to follow their own school or district's policies on classroom technology and
-        student data before using any real names or game codes with students.
+        Jeopardy or GLITCH game their teacher is hosting — never an email address or other contact
+        information. StudyArcade is not directed at children as a consumer product, and it is the
+        responsibility of the teacher using the app to follow their own school or district's policies on
+        classroom technology and student data before using any real names or game codes with students.
       </p>
 
       <h2>Your choices</h2>
       <p>
         Because almost everything lives in your own browser, you're already in control of it: clear your
         browser's site data at any time, remove a saved playset from the "My playsets" view, or export your
-        library before clearing anything so you have a backup. For data generated by a live Jeopardy game,
-        email us at the address below to ask what we have or to request it be deleted before its automatic
-        7-day expiry.
+        library before clearing anything so you have a backup. For data generated by a live Jeopardy or
+        GLITCH game, email us at the address below to ask what we have or to request it be deleted before its
+        automatic 7-day expiry.
       </p>
 
       <h2>Changes to this policy</h2>
@@ -149,24 +161,24 @@ function TermsOfService() {
 
       <h2>What StudyArcade is</h2>
       <p>
-        StudyArcade is a free tool for running classroom review games — Bingo, Memory, and live Jeopardy — in
-        a web browser or the optional desktop app. It's provided as-is, by an independent developer, with no
-        guarantee of uptime, accuracy, or fitness for any particular purpose.
+        StudyArcade is a free tool for running classroom review games — Bingo, Memory, live Jeopardy, and
+        GLITCH — in a web browser or the optional desktop app. It's provided as-is, by an independent
+        developer, with no guarantee of uptime, accuracy, or fitness for any particular purpose.
       </p>
 
       <h2>No accounts, your content is yours</h2>
       <p>
         StudyArcade doesn't require an account. Any playset, board, or other content you create or import
         remains yours. Content you save locally stays in your own browser and is never uploaded to us,
-        except for the board content and player activity of a live Jeopardy game you choose to host or join,
-        which is handled as described in the Privacy Policy.
+        except for the board content and player activity of a live Jeopardy or GLITCH game you choose to host
+        or join, which is handled as described in the Privacy Policy.
       </p>
 
       <h2>Acceptable use</h2>
       <p>When using StudyArcade, you agree not to:</p>
       <ul>
-        <li>Use a live Jeopardy game code or session to collect, expose, or solicit sensitive personal
-          information about real people, including students.</li>
+        <li>Use a live Jeopardy or GLITCH game code or session to collect, expose, or solicit sensitive
+          personal information about real people, including students.</li>
         <li>Submit content that is unlawful, harassing, discriminatory, or infringes someone else's
           intellectual property or privacy rights.</li>
         <li>Attempt to disrupt, overload, or gain unauthorized access to the Service or its underlying
@@ -193,8 +205,8 @@ function TermsOfService() {
       <h2>Third-party services</h2>
       <p>
         StudyArcade depends on third-party infrastructure (Vercel for hosting, Supabase for the live Jeopardy
-        database, Google Fonts, and GitHub for optional desktop updates). Availability of the Service depends
-        on theirs.
+        and GLITCH database, Google Fonts, and GitHub for optional desktop updates). Availability of the
+        Service depends on theirs.
       </p>
 
       <h2>Changes</h2>

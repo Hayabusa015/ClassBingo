@@ -4,10 +4,10 @@ import { getDeck } from '../data/decks';
 import { ElementTile } from './CallCard';
 import Reveal from './Reveal';
 import { GAME_MODE_LABEL, GAME_MODE_TAGLINE, GAME_MODES } from '../lib/gameConfig';
-import { BingoIcon, ChevronRightIcon, JeopardyIcon, MemoryIcon } from './NavIcons';
+import { BingoIcon, ChevronRightIcon, JeopardyIcon, MemoryIcon, GlitchIcon } from './NavIcons';
 import ShullLogo from './ShullLogo';
 
-const MODE_ICON = { bingo: BingoIcon, memory: MemoryIcon, jeopardy: JeopardyIcon };
+const MODE_ICON = { bingo: BingoIcon, memory: MemoryIcon, jeopardy: JeopardyIcon, glitch: GlitchIcon };
 
 const STEPS = [
   {
@@ -16,16 +16,16 @@ const STEPS = [
   },
   {
     title: 'Launch it live',
-    body: 'Project Bingo calls, a Memory board, or a full Jeopardy board on the classroom screen.',
+    body: 'Project Bingo calls, a Memory board, a full Jeopardy board, or a live GLITCH game on the classroom screen.',
   },
   {
     title: 'Class plays together',
-    body: 'Students mark boards, race the clock, or buzz in from their own Chromebook.',
+    body: 'Students mark boards, race the clock, buzz in, or hunt for the Glitch from their own Chromebook.',
   },
 ];
 
 const STATS = [
-  { value: '3', label: 'Game modes' },
+  { value: '4', label: 'Game modes' },
   { value: '22+', label: 'Ready-made playsets' },
   { value: '8', label: 'Subjects covered' },
   { value: '0', label: 'Logins required' },
@@ -51,8 +51,8 @@ export default function LandingPage({ onNavigate, onOpenLegal }: Props) {
             <span>Great game days.</span>
           </h1>
           <p className="landing-subtext">
-            Your curriculum, a little friendly competition. Turn review time into Bingo, Memory, or live
-            Jeopardy.
+            Your curriculum, a little friendly competition. Turn review time into Bingo, Memory, live
+            Jeopardy, or a GLITCH social-deduction hunt.
           </p>
           <div className="landing-cta-row">
             <button className="btn btn-primary btn-lg" onClick={() => onNavigate('bingo')}>
@@ -91,7 +91,7 @@ export default function LandingPage({ onNavigate, onOpenLegal }: Props) {
 
       <Reveal>
         <div className="landing-section-heading">
-          <h2>One lesson. Three ways to play.</h2>
+          <h2>One lesson. Four ways to play.</h2>
           <p>Choose the pace that fits your classroom.</p>
         </div>
         <section className="landing-modes" aria-label="Game modes">

@@ -10,6 +10,8 @@ import { randomGameCode } from './lib/rng';
 import type { MemorySettings } from './lib/memory';
 import type { HostCredentials, JeopardyBoard } from './lib/jeopardy';
 import { createSession as createJeopardySession, saveHostSession, loadHostSession, clearHostSession } from './lib/jeopardy';
+import type { GlitchHostCredentials } from './lib/glitch';
+import { loadGlitchHostSession, clearGlitchHostSession } from './lib/glitch';
 import {
   readLibrary,
   writeLibrary,
@@ -33,6 +35,8 @@ import MemoryGame from './components/MemoryGame';
 import JeopardyHome from './components/JeopardyHome';
 import JeopardyBoardBuilder from './components/JeopardyBoardBuilder';
 import JeopardyHost from './components/JeopardyHost';
+import GlitchSetup from './components/GlitchSetup';
+import GlitchHost from './components/GlitchHost';
 
 function defaultSettingsFor(deck: DeckConfig): GameSettings {
   const count = getFilteredItems(deck, deck.defaultFilterId).length;
@@ -49,7 +53,9 @@ function defaultSettingsFor(deck: DeckConfig): GameSettings {
 export default function App() {
   const [libraryState, setLibraryState] = useState(readLibrary);
   const library = libraryState.playsets;
-  const [view, setView] = useState<View>(() => (loadHostSession() ? 'jeopardy-host' : 'landing'));
+  const [view, setView] = useState<View>(() =>
+    loadHostSession() ? 'jeopardy-host' : loadGlitchHostSession() ? 'glitch-host' : 'landing',
+  );
   const [libraryMode, setLibraryMode] = useState<GameMode>('bingo');
   const [jeopardyBoardId, setJeopardyBoardId] = useState<string | undefined>();
   const [jeopardyEditingBoard, setJeopardyEditingBoard] = useState<JeopardyBoard | null>(null);
@@ -62,6 +68,9 @@ export default function App() {
   const [memoryDeck, setMemoryDeck] = useState<DeckConfig | null>(null);
   const [memoryActiveCustom, setMemoryActiveCustom] = useState<SavedPlayset | undefined>();
   const [memorySettings, setMemorySettings] = useState<MemorySettings | null>(null);
+  const [glitchDeck, setGlitchDeck] = useState<DeckConfig | null>(null);
+  const [glitchActiveCustom, setGlitchActiveCustom] = useState<SavedPlayset | undefined>();
+  const [glitchHostCreds, setGlitchHostCreds] = useState<GlitchHostCredentials | null>(() => loadGlitchHostSession());
   const [callStyle, setCallStyle] = useState<CallStyle>('both');
   const [winPattern, setWinPattern] = useState<WinPattern>('line');
   const [resumable, setResumable] = useState<SessionState | null>(null);
@@ -121,11 +130,17 @@ export default function App() {
     setMemorySettings(null);
     setView('memory-setup');
   };
+  const startGlitch = (chosen: DeckConfig, saved?: SavedPlayset) => {
+    setGlitchDeck(chosen);
+    setGlitchActiveCustom(saved);
+    setView('glitch-setup');
+  };
   const handlePickDeck = (id: DeckId) => {
     const saved = library.find((entry) => entry.id === id);
     const chosen = saved ? playsetToDeck(saved) : findDeck(id);
     if (!chosen) return;
     if (libraryMode === 'memory') startMemory(chosen, saved);
+    else if (libraryMode === 'glitch') startGlitch(chosen, saved);
     else startDeck(chosen, saved);
   };
   const persistNewPlayset = (saved: SavedPlayset) => {
@@ -156,6 +171,28 @@ export default function App() {
     setMemoryDeck(null);
     setMemoryActiveCustom(undefined);
     setMemorySettings(null);
+  };
+  const saveGlitchSelection = (title: string, filterId: string, selectedItemIds?: string[]) => {
+    if (!glitchDeck) return;
+    const items = getFilteredItems(glitchDeck, filterId, selectedItemIds);
+    const source = glitchActiveCustom ? glitchActiveCustom.sourceDeckId : glitchDeck.id;
+    persistNewPlayset(newPlayset(title, glitchDeck.subject || 'Science', items, source));
+  };
+  const exitGlitchSetup = () => {
+    setView('home');
+    setGlitchDeck(null);
+    setGlitchActiveCustom(undefined);
+  };
+  const handleHostGlitch = (creds: GlitchHostCredentials) => {
+    setGlitchHostCreds(creds);
+    setView('glitch-host');
+  };
+  const exitGlitchHost = () => {
+    clearGlitchHostSession();
+    setGlitchHostCreds(null);
+    setGlitchDeck(null);
+    setGlitchActiveCustom(undefined);
+    setView('home');
   };
   const handleNavigate = (target: NavTarget) => {
     if (target === 'landing') {
@@ -288,6 +325,21 @@ export default function App() {
         boardId={jeopardyBoardId}
         onBack={() => setView('jeopardy-home')}
         onHost={handleHostJeopardy}
+        theme={theme}
+        onCycleTheme={cycleTheme}
+      />
+    );
+  if (view === 'glitch-host' && glitchHostCreds)
+    return (
+      <GlitchHost credentials={glitchHostCreds} onExit={exitGlitchHost} theme={theme} onCycleTheme={cycleTheme} />
+    );
+  if (view === 'glitch-setup' && glitchDeck)
+    return (
+      <GlitchSetup
+        deck={glitchDeck}
+        onBack={exitGlitchSetup}
+        onHost={handleHostGlitch}
+        onSaveSelection={saveGlitchSelection}
         theme={theme}
         onCycleTheme={cycleTheme}
       />

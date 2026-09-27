@@ -55,6 +55,16 @@ export function JeopardyIcon({ className }: IconProps) {
   );
 }
 
+export function GlitchIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="4" y="4" width="16" height="16" rx="2.5" />
+      <path d="M9 8v3l-2 1 2 1v3" />
+      <path d="M15 8v3l2 1-2 1v3" />
+    </svg>
+  );
+}
+
 export function ChevronRightIcon({ className }: IconProps) {
   return (
     <svg {...base} width={16} height={16} className={className}>

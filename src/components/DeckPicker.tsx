@@ -59,7 +59,8 @@ export default function DeckPicker({
     <main className="page page-home page-library">
       <header className="shell-page-header">
         <span className="home-eyebrow">
-          <span className="status-spark" /> {mode === 'memory' ? 'MATCHING GAME' : 'CLASSROOM REVIEW GAME'}
+          <span className="status-spark" />{' '}
+          {mode === 'memory' ? 'MATCHING GAME' : mode === 'glitch' ? 'SOCIAL DEDUCTION' : 'CLASSROOM REVIEW GAME'}
         </span>
         <h1>{GAME_MODE_LABEL[mode]}</h1>
         <p className="subtitle">{GAME_MODE_TAGLINE[mode]}</p>
@@ -175,7 +176,8 @@ export default function DeckPicker({
                 <span className="deck-tile-footer">
                   <span className="deck-tile-count">{deck.items.length} items</span>
                   <span className="deck-launch">
-                    {mode === 'memory' ? 'Play Memory' : 'Customize'} <span aria-hidden="true">↗</span>
+                    {mode === 'memory' ? 'Play Memory' : mode === 'glitch' ? 'Play GLITCH' : 'Customize'}{' '}
+                    <span aria-hidden="true">↗</span>
                   </span>
                 </span>
               </button>

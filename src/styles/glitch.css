@@ -1,0 +1,313 @@
+/* GLITCH — social-deduction review game. Restrained, token-based styling to
+   match modern.css; tension comes from content (a clear meter, a crisp
+   danger state) rather than decorative effects. */
+@media screen {
+  .page-glitch-setup .setup-grid {
+    margin-bottom: 20px;
+  }
+  .glitch-rounds-input {
+    max-width: 100px;
+  }
+
+  /* ---------- Level cards ---------- */
+  .glitch-level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .glitch-level-card {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .glitch-level-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .glitch-level-card.locked {
+    opacity: 0.55;
+  }
+  .glitch-level-card h3 {
+    margin: 8px 0 2px;
+    font-size: 1.05rem;
+  }
+  .glitch-level-bestfor {
+    margin: 0 0 8px;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+  .glitch-level-pips {
+    display: flex;
+    gap: 4px;
+  }
+  .glitch-level-pips span {
+    width: 16px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+  }
+  .glitch-level-pips span.filled {
+    background: var(--accent);
+  }
+  .glitch-level-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--bg-tile);
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Host topbar ---------- */
+  .glitch-host-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .glitch-code-chip {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+  .glitch-code-chip strong {
+    color: var(--accent-strong);
+  }
+  .glitch-final-round-badge {
+    color: var(--danger);
+    font-weight: 800;
+    letter-spacing: 0.03em;
+  }
+  .glitch-shortcut-legend {
+    margin: 0 0 18px;
+    font-size: 0.75rem;
+  }
+
+  /* ---------- Roster + emblems ---------- */
+  .glitch-lobby-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .glitch-roster {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .glitch-roster-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+  .glitch-kick-btn {
+    margin-left: auto;
+    padding: 4px 10px;
+  }
+  .glitch-emblem {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--bg-tile);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .glitch-emblem-color-0 { color: #e0717a; }
+  .glitch-emblem-color-1 { color: #e0a052; }
+  .glitch-emblem-color-2 { color: #d8c257; }
+  .glitch-emblem-color-3 { color: #7fbf6a; }
+  .glitch-emblem-color-4 { color: #5fb8b0; }
+  .glitch-emblem-color-5 { color: #6f9de0; }
+  .glitch-emblem-color-6 { color: #9b7fe0; }
+  .glitch-emblem-color-7 { color: #d478c9; }
+
+  /* ---------- Meter ---------- */
+  .glitch-meter-stage {
+    text-align: center;
+  }
+  .glitch-meter {
+    position: relative;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--bg-tile);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .glitch-meter-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s var(--ease-product, ease);
+  }
+  .glitch-meter-tick {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: color-mix(in srgb, var(--bg) 40%, transparent);
+  }
+  .glitch-meter-label {
+    margin: 10px 0 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .glitch-needs-more {
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .glitch-timer {
+    margin: 14px 0 4px;
+    font-size: 2.4rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .glitch-timer-danger {
+    color: var(--danger);
+  }
+
+  /* ---------- Ended ---------- */
+  .glitch-ended {
+    text-align: center;
+  }
+
+  /* ---------- Student status row ---------- */
+  .glitch-player-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: -8px 0 20px;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+  .glitch-connection-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .glitch-connection-dot.offline {
+    background: var(--warn);
+  }
+  .glitch-charges {
+    margin-left: 8px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .glitch-ghost-banner {
+    text-align: center;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+  }
+
+  /* ---------- Question stage ---------- */
+  .glitch-question-stage {
+    text-align: center;
+  }
+  .glitch-question-timer {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-tile);
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .glitch-question-timer-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.2s linear;
+  }
+  .glitch-question-timer-fill.danger {
+    background: var(--danger);
+  }
+  .glitch-question-prompt {
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 700;
+    margin: 0 0 22px;
+  }
+  .glitch-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .glitch-choice-btn {
+    position: relative;
+    padding: 18px 14px 18px 40px;
+    font-size: 1.05rem;
+    text-align: left;
+  }
+  .glitch-choice-btn.is-selected {
+    border-color: var(--accent);
+    background: var(--accent-soft, var(--bg-tile));
+  }
+  .glitch-choice-num {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--bg-tile);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .glitch-feedback {
+    padding: 30px 0;
+  }
+  .glitch-feedback-mark {
+    font-size: 3rem;
+    margin: 0 0 10px;
+  }
+  .glitch-feedback.correct .glitch-feedback-mark {
+    color: var(--accent);
+  }
+  .glitch-feedback.incorrect .glitch-feedback-mark {
+    color: var(--danger);
+  }
+  .glitch-feedback-pair {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+  }
+
+  .glitch-wait-card {
+    text-align: center;
+    padding: 48px 24px;
+  }
+  .glitch-waiting-big {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 700px) {
+    .glitch-host-topbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .glitch-choice-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

@@ -1,7 +1,8 @@
 # StudyArcade
 
-A review-game hub for classrooms: Bingo, Memory, and live
-multiplayer Jeopardy, all built around a searchable, offline library of
+A review-game hub for classrooms: Bingo, Memory, live
+multiplayer Jeopardy, and GLITCH — a live social-deduction review game — all
+built around a searchable, offline library of
 **22 classroom playsets**. Subjects include science, math, English, social
 studies, world languages, technology, arts, and health/PE. The original
 four science decks are joined by 18 sets of 30 answer/clue pairs. Suggested

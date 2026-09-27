@@ -2,7 +2,7 @@
   "name": "studyarcade",
   "private": true,
   "version": "1.0.2",
-  "description": "A projector-friendly arcade of classroom review games — Bingo, Memory, and live Jeopardy.",
+  "description": "A projector-friendly arcade of classroom review games — Bingo, Memory, live Jeopardy, and GLITCH.",
   "author": "Matthew Shull",
   "type": "module",
   "main": "electron/main.cjs",

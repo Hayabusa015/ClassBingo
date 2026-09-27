@@ -34,7 +34,7 @@ export default function PrivacyNotice({ onOpenPrivacy }: Props) {
     <div className="privacy-notice" role="dialog" aria-label="Privacy notice">
       <p>
         StudyArcade saves your theme and playsets in your browser only — no accounts, no ads, no tracking.
-        Live Jeopardy games sync player first names through our database to run in real time.{' '}
+        Live Jeopardy and GLITCH games sync player first names through our database to run in real time.{' '}
         <button className="privacy-notice-link" onClick={onOpenPrivacy}>
           Privacy Policy
         </button>

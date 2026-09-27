@@ -30,15 +30,23 @@ export type View =
   | 'memory-play'
   | 'jeopardy-home'
   | 'jeopardy-builder'
-  | 'jeopardy-host';
+  | 'jeopardy-host'
+  | 'glitch-setup'
+  | 'glitch-host';
 
-export type GameMode = 'bingo' | 'memory' | 'jeopardy';
-export const GAME_MODES: GameMode[] = ['bingo', 'memory', 'jeopardy'];
-export const GAME_MODE_LABEL: Record<GameMode, string> = { bingo: 'Bingo', memory: 'Memory', jeopardy: 'Jeopardy' };
+export type GameMode = 'bingo' | 'memory' | 'jeopardy' | 'glitch';
+export const GAME_MODES: GameMode[] = ['bingo', 'memory', 'jeopardy', 'glitch'];
+export const GAME_MODE_LABEL: Record<GameMode, string> = {
+  bingo: 'Bingo',
+  memory: 'Memory',
+  jeopardy: 'Jeopardy',
+  glitch: 'GLITCH',
+};
 export const GAME_MODE_TAGLINE: Record<GameMode, string> = {
   bingo: 'Call items live and watch the boards fill up.',
   memory: 'Flip, match, and race the clock — solo or head-to-head.',
   jeopardy: 'Build a board, then host it live — students join from their own device.',
+  glitch: 'Repair the machine. Find the glitch. Trust no one.',
 };
 
 /** Sidebar nav targets: every game mode, plus the marketing landing page. */

@@ -1,10 +1,10 @@
 import type { NavTarget, Theme } from '../lib/gameConfig';
 import { GAME_MODE_LABEL, GAME_MODES } from '../lib/gameConfig';
-import { HomeIcon, BingoIcon, MemoryIcon, JeopardyIcon } from './NavIcons';
+import { HomeIcon, BingoIcon, MemoryIcon, JeopardyIcon, GlitchIcon } from './NavIcons';
 import ThemeToggle from './ThemeToggle';
 import UpdateChecker from './UpdateChecker';
 
-const MODE_ICON = { bingo: BingoIcon, memory: MemoryIcon, jeopardy: JeopardyIcon };
+const MODE_ICON = { bingo: BingoIcon, memory: MemoryIcon, jeopardy: JeopardyIcon, glitch: GlitchIcon };
 
 interface Props {
   active: NavTarget;
