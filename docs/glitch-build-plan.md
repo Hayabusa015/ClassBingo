@@ -437,31 +437,114 @@ Commit after each phase with a clear message. Each phase lists its acceptance cr
 - **RPCs:** create, join, start, next_question, submit_answer, advance (`repair ↔ intermission → ended`), add_time, kick, end, `glitch_now`, check helpers.
 - **Cleanup:** the new `cleanup_old_live_sessions` cron.
 - **Code:** `glitch.ts` (builder, levels, wrappers), `GlitchSetup` (L0 only is fine), `GlitchHost` (lobby / repair / intermission / ended), `GlitchPlayApp` (join / lobby / question loop / ended), and all wiring from §6.2.
-- **Also:** Privacy/Terms/notice updates.
-- ✅ **Acceptance:** a SQL script plays a full 2-round L0 game; the meter reaches its goal and `winner` is set. The UI renders in all themes. Tests and build pass.
+- **Also:** Privacy/Terms/notice updates, plus every **[P1]** item in §10 (emblems, pause, lock room, host shortcuts, connection indicator, wake lock, named rounds, learning feedback, name filter…).
+- ✅ **Acceptance:** a SQL script plays a full 2-round L0 game, including a pause/resume and a locked-room join rejection; the meter reaches its goal and `winner` is set. The UI renders in all themes. Tests and build pass.
 
 ### Phase 2: Hidden Glitch, Levels 1–2
 - **Tables:** add `glitch_sabotages` and `glitch_votes`.
 - **Game logic:** roles, sectors, Scan (hint + corrupt), resolve with sector wiping, alert evidence, voting, reveal, veto, ghosts, and every win check in §2.5.
 - **RPCs:** `my_state`, `scan`, `cast_vote`, `vote_count`, `veto_ejection`.
-- **UI:** hold-to-peek role card, charges + Scan, alert board, vote screen, reveal, ghost state.
-- ✅ **Acceptance:** SQL scripts cover (a) Players winning by ejecting the Glitch, (b) Glitches winning when the meter falls short, (c) a veto restoring a student, and (d) `anon` being unable to read any role, vote, or sabotage. Scan responses are byte-for-byte identical in shape for Player and Glitch.
+- **UI:** hold-to-peek role card, charges + Scan, alert board, vote screen, reveal, ghost state, plus every **[P2]** item in §10 (private streaks, detective notes, evidence/vote reveals, result lines, unmask grid…).
+- ✅ **Acceptance:** a 3-streak grants the bonus charge. SQL scripts cover (a) Players winning by ejecting the Glitch, (b) Glitches winning when the meter falls short, (c) a veto restoring a student, and (d) `anon` being unable to read any role, vote, or sabotage. Scan responses are byte-for-byte identical in shape for Player and Glitch.
 
 ### Phase 3: Level 3 + Outbreak
 - **L3:** hidden role on ejection, framing a neighbor sector, tag-matched distractors.
 - **Outbreak:** infected roles, target picker, expose → shield question → infection at resolve, the Cure meter, "N new infections" evidence, the quarantine vote, and Outbreak win conditions.
+- **Also:** every **[P3]** item in §10.
 - ✅ **Acceptance:** SQL scripts cover an infection spreading through a failed shield question, a successful shield blocking it, and each Outbreak win path.
 
 ### Phase 4: Polish
-- Sounds through the existing `src/lib/sound.ts`: corruption alert, vote reveal, win/lose.
-- Meter animations and the arcade flourishes from §6.5.
-- `glitch_host_recap` screen with the most-missed questions.
+- Sound design and meter milestones / "CLUTCH REPAIR" (§10.3).
+- `glitch_host_recap` screen: most-missed questions → "Make a review playset from these", plus positive awards (§10.4).
+- Rematch with the same code and roster (§10.4).
+- Suggested next level (§10.1).
 - A short "How to play" panel on `GlitchSetup` and the student lobby.
-- ✅ **Acceptance:** a polished, playable class game in all themes, with a teacher recap.
+- ✅ **Acceptance:** a SQL script runs a full game, then a rematch, and confirms students stay joined with fresh state. The most-missed list saves as a playable local playset. It's a polished, playable class game in all themes.
 
 ---
 
-## 10. Out of scope (don't build)
+## 10. Small details that make it feel like a game
+
+These details are what separate "a quiz with roles" from a game students ask for again. Each item is tagged with the phase it ships in: **[P1]**–**[P4]**. **Build every item tagged for a phase as part of that phase**, not as an afterthought.
+
+Four rules apply to every detail:
+- **Personal stats stay private.** They show only on that student's own device, never on the projector.
+- **Public highlights are positive only.** Never rank the "worst" anything.
+- **Motion respects `prefers-reduced-motion`.**
+- **Nothing is persisted beyond the session**, except where "local" is stated.
+
+### 10.1 Level flavor
+| Detail | Phase |
+|---|---|
+| **Level cards with real numbers.** Each card shows a difficulty pip bar (1–4), a "Best for" line (L0 *First day / warm-up*, L1 *First real game*, L2 *Regular review*, L3 *Test prep / challenge day*), a **live Glitch-count preview for the current roster** ("With 24 students → 3 Glitches"), and an estimated length ("~20 min"). The estimate is computed from `repairSeconds`, `discussionSeconds`, `voteSeconds`, and rounds. | P1 (L0 card), P2 (rest) |
+| **Level badge identity.** Practice, Rookie, Pro, and Legend each get a distinct badge. Define per-level accent tokens in `glitch.css` for all four themes. The badge appears on setup, the projector top bar, and student lobbies. | P1 |
+| **Named rounds.** Rounds get system-stage names: 1 *Boot Sequence*, 2 *Memory Check*, 3 *Core Scan*, 4 *Firewall*, 5 *System Restore*, 6 *Final Patch*. Display as "ROUND 3 · CORE SCAN". | P1 |
+| **Final-round callout.** A "FINAL ROUND" badge appears. The goal marker on the meter gently emphasizes. The host sees "Needs 58 more" next to the meter. | P1 |
+| **Glitches-remaining counter.** L1–L2: "Glitches remaining: 2". L3: "Glitches remaining: ?". | P2 / P3 |
+| **Lobby tips.** Rotating one-line tips on both the projector and student lobby, specific to the level and mode. Examples: "A name that shows up in two corrupted sectors is a strong clue." / "Scanning costs charges — every correct answer earns one." | P2 |
+| **Suggested next level (local).** Keep a per-level "games hosted" count in the teacher's `localStorage` via `saveState`. After 3 games on a level, the setup screen suggests the next one ("You've run Rookie 3 times — ready for Pro?"). | P4 |
+
+### 10.2 Student device
+| Detail | Phase |
+|---|---|
+| **Emblems.** On join, each student gets a random emblem, a shape (● ▲ ■ ◆ ★ ⬢) plus one of 8 token colors, unique within the session where possible. It shows beside their name everywhere. This keeps the projector scannable and tells apart two students named "Alex". Store it as a public `emblem int` column on `glitch_players`. | P1 |
+| **Duplicate names.** `glitch_join` auto-suffixes duplicates: "Alex", "Alex 2". | P1 |
+| **Question-card timer bar.** A thin bar drains across the top of the card. For the last 5 seconds it switches to `--danger`. | P1 |
+| **Numbered choices.** Choice buttons show key hints `1`–`4`. The picked choice gets a short "lock-in" press state before the result appears. | P1 |
+| **Learning feedback.** On a wrong answer, show the correct pairing in full ("**Sodium** — Alkali metal, period 3") for about 1.5s before the next question. On a right answer, show a quick ✔. Include `itemName` and `pairLabel` in the submit response for this. | P1 |
+| **Private streaks.** Count consecutive correct answers on the device: "🔥 3 in a row". Every **3-streak awards +1 bonus charge**, which rewards accuracy without public pressure. Track `streak` and `best_streak` in `glitch_player_secrets`, return them from `glitch_submit_answer`, and use `best_streak` for awards (§10.4). | P2 |
+| **Charge pips + Scan ring.** Show charges as pips (●●○). The Scan button carries a progress ring that fills toward `scanCost` and gets a subtle "ready" state once it's affordable. | P2 |
+| **Personal round summary.** At the end of each Repair, the student's own device shows "You answered 7 · 5 correct · +6 charges" and never displays it anywhere else. | P2 |
+| **Role reveal moment.** At game start the device shows "Your role is ready — press and hold to view." The first hold plays a card flip. Call `navigator.vibrate(60)` where supported, i.e. phones; Chromebooks just skip it. | P2 |
+| **Detective notes (local only).** During Alert and Vote, tapping a name cycles its mark: none → 🤔 suspicious → ✅ cleared. The marks live in component state only and are **never sent to the server**. Marks carry over between rounds and reset at game end. | P2 |
+| **Vote clarity.** The current pick is highlighted, with the note "You can change your vote until time's up." When time runs out, the screen switches to a "Vote locked" state. | P2 |
+| **Ghost mode.** The UI desaturates slightly and shows a ghost badge plus "Your repairs still count." The vote and role controls disappear. | P2 |
+| **Connection indicator.** A small status dot: green = live, amber = reconnecting. Show a "Reconnecting…" banner, then refetch the session and `glitch_my_state` when the realtime channel recovers. School Wi-Fi drops a lot. | P1 |
+| **Keep the screen awake.** Request a Screen Wake Lock (`navigator.wakeLock`, where supported) while the game is active, and re-acquire it on `visibilitychange`. | P1 |
+| **Readable questions.** Question text is at least 20px on the device, left-aligned, and uses the body font. CORRUPTED/Clean states always pair an icon with text, never color alone. | P1 |
+
+### 10.3 Projector / host
+| Detail | Phase |
+|---|---|
+| **Lobby.** Names pop in with their emblems, under a big "18 joined" counter. The join URL and code are huge in the lobby, then shrink to a top-bar chip once the game starts. **Optional:** a QR code for students on phones, using a small QR library; leave it out if it adds a heavy dependency. | P1 |
+| **Lock room.** A host toggle stops new joins, e.g. once class has started. Add a public `locked boolean` column on `glitch_sessions`; `glitch_join` rejects joins while it's set. | P1 |
+| **Pause.** The host can pause the timers for interruptions like a fire drill or a question from the office. Add a `paused_remaining_ms int` column on `glitch_sessions`: while paused, `phase_ends_at` is null. While paused, submits and scans are rejected with a friendly message, and student devices show "Paused by teacher." Add a `glitch_pause(p_paused bool)` RPC. | P1 |
+| **Host keyboard shortcuts.** `Space` = Next/advance, `P` = pause/resume, `=` = +30s, `F` = fullscreen, `M` = mute. These mirror the existing Bingo caller shortcuts. Show a small "?" legend. | P1 |
+| **Live activity equalizer.** During Repair, a subtle bar visualizer pulses with answers per second across the whole class. It carries **no** correctness or sector information, so it shows energy without leaking anything. The host already receives the answering count, so derive it from that. | P2 |
+| **Evidence reveal.** In Alert, sector cards reveal one at a time, about 400ms apart, like a diagnostic readout. With reduced motion, show them all at once. | P2 |
+| **Vote tally reveal.** In Reveal, vote bars grow one name at a time before the result line. | P2 |
+| **Result lines.** These must be original, not Among Us phrasing. Glitch found: "**GLITCH FOUND** — Maya". Wrong student: "**SCAN CLEAN** — Maya was not a Glitch". L3 with roles hidden: "**SIGNAL LOST** — Maya's identity is unknown". No ejection: "**NO CONSENSUS** — the system stays as-is". | P2 |
+| **Vote nudge.** "3 students haven't voted" appears in the last 10 seconds (a count, never names). | P2 |
+| **Meter milestones.** Tick marks at 25/50/75% of the goal, each with a soft chime when crossed. **"CLUTCH REPAIR"** banner if the goal is crossed in the last 10 seconds of a Repair. | P4 |
+| **Sound design.** Use `src/lib/sound.ts` (mute with `M`, off by default in the student app): a tick for the last 5 seconds, a chime at 10 seconds left, a corruption alert when an Alert shows a CORRUPTED sector, a vote-reveal sting, and win/lose stings. | P4 |
+
+### 10.4 End of game
+| Detail | Phase |
+|---|---|
+| **Role unmask grid.** Every student's emblem and name, with their role revealed one card at a time. Glitches get a distinct outline. | P2 |
+| **Positive awards (host can toggle off).** Up to 4, each only if earned. **Top Repairer** (most correct). **Streak Master** (highest `best_streak`). **Sharpest Detective** (most votes cast for actual Glitches). **Sneakiest Glitch** (most corruptions without being ejected). Compute them in `glitch_host_recap` and show them on the projector. | P4 |
+| **Most-missed → new playset.** The recap lists the 5 most-missed items. A **"Make a review playset from these"** button saves those items as a local custom playset (reuse `newPlayset()` from `src/lib/playsets.ts`, like "Save this selection"), so the class can drill them next in Bingo or Memory. | P4 |
+| **Rematch.** "Play again" resets the **same session** to `lobby` with the same code, and joined students stay connected: roles are cleared, `round = 0`, the meter resets, votes, sabotages, and answers for that session are deleted, and every student is set back to `active`. Add a `glitch_rematch` host RPC. The host can change the level before restarting. | P4 |
+| **Student end screen.** Winner, their own role, and a private personal line: "You answered 34 · 🔥 best streak 7." | P2 |
+
+### 10.5 Classroom guardrails
+| Detail | Phase |
+|---|---|
+| **Name filter.** `glitch_join` rejects names that match a small server-side blocklist of common profanity; keep the list short and in SQL. Show a generic "Please choose a different name" error. The host can always kick. | P1 |
+| **Late joiners.** They see "Game in progress — you'll join as a Ghost and can still repair." | P1 |
+| **Join rejection messages.** Friendly, specific errors for: room locked, game ended, room full (40), and bad code. | P1 |
+
+**Schema deltas this section adds to §4.2:**
+- `glitch_players.emblem int not null`
+- `glitch_sessions.locked boolean not null default false`
+- `glitch_sessions.paused_remaining_ms int`
+- `glitch_player_secrets.streak int not null default 0` and `best_streak int not null default 0`
+
+**New RPCs:** `glitch_pause`, `glitch_set_locked`, `glitch_rematch`.
+
+---
+
+## 11. Out of scope (don't build)
 - Avatars, maps, movement, or anything resembling Among Us visuals or terms ("crewmate," "impostor," "vent," "emergency meeting").
 - In-app text chat. Discussion happens out loud in class.
 - Accounts or login.
