@@ -106,6 +106,28 @@
     justify-content: space-between;
     gap: 8px;
   }
+  .sidebar-legal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 0 2px;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+  }
+  .sidebar-legal button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .sidebar-legal button:hover {
+    color: var(--text-dim);
+  }
 
   /* ---------- Shared "page inside the shell" header ---------- */
   .shell-page-header {
@@ -286,6 +308,7 @@
   .landing-footer {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
     padding: 20px 0 40px;
     color: var(--text-faint);
@@ -294,6 +317,119 @@
   .landing-footer .shull-logo {
     width: 32px;
     height: 32px;
+  }
+  .landing-footer-legal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .landing-footer-legal button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .landing-footer-legal button:hover {
+    color: var(--text-dim);
+  }
+
+  /* ---------- Legal pages (Privacy / Terms) ---------- */
+  .page-legal {
+    max-width: 780px;
+  }
+  .page-legal .setup-header {
+    justify-content: flex-start;
+  }
+  .legal-header-toggle {
+    margin-left: auto;
+  }
+  .legal-body {
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-size: 0.98rem;
+  }
+  .legal-updated {
+    color: var(--text-faint);
+    font-size: 0.85rem;
+    margin-top: 0;
+  }
+  .legal-body h2 {
+    color: var(--text);
+    font-size: 1.2rem;
+    margin: 32px 0 10px;
+  }
+  .legal-body h3 {
+    color: var(--text);
+    font-size: 1rem;
+    margin: 20px 0 8px;
+  }
+  .legal-body p {
+    margin: 0 0 14px;
+  }
+  .legal-body ul {
+    margin: 0 0 14px;
+    padding-left: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .legal-body a {
+    color: var(--accent-strong);
+  }
+  .legal-body code {
+    background: var(--bg-tile);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  /* ---------- Privacy notice banner ---------- */
+  .privacy-notice {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 60;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .privacy-notice p {
+    flex: 1;
+    min-width: 240px;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .privacy-notice-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--accent-strong);
+    font: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .privacy-notice-dismiss {
+    flex-shrink: 0;
+  }
+  body.has-privacy-notice {
+    padding-bottom: 110px;
   }
 
   @media (max-width: 860px) {
@@ -336,6 +472,9 @@
       margin-left: auto;
       padding-top: 0;
       border-top: none;
+    }
+    .sidebar-legal {
+      display: none;
     }
     .landing-stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -21,6 +21,8 @@ import {
 } from './lib/playsets';
 import AppShell from './components/AppShell';
 import LandingPage from './components/LandingPage';
+import LegalPage from './components/LegalPage';
+import PrivacyNotice from './components/PrivacyNotice';
 import DeckPicker from './components/DeckPicker';
 import GameSetup from './components/GameSetup';
 import Caller from './components/Caller';
@@ -240,6 +242,9 @@ export default function App() {
     } else setSettings(next);
   };
 
+  const screen = (() => {
+  if (view === 'privacy' || view === 'terms')
+    return <LegalPage page={view} onBack={() => setView('landing')} theme={theme} onCycleTheme={cycleTheme} />;
   if (creating)
     return <CustomPlayset initialTitle={creationTitle} onSave={saveNew} onBack={() => setCreating(false)} />;
   if (view === 'memory-setup' && memoryDeck)
@@ -285,19 +290,19 @@ export default function App() {
     );
   if (view === 'landing')
     return (
-      <AppShell active="landing" onNavigate={handleNavigate} theme={theme} onCycleTheme={cycleTheme}>
-        <LandingPage onNavigate={handleNavigate} />
+      <AppShell active="landing" onNavigate={handleNavigate} onOpenLegal={(p) => setView(p)} theme={theme} onCycleTheme={cycleTheme}>
+        <LandingPage onNavigate={handleNavigate} onOpenLegal={(p) => setView(p)} />
       </AppShell>
     );
   if (view === 'jeopardy-home')
     return (
-      <AppShell active="jeopardy" onNavigate={handleNavigate} theme={theme} onCycleTheme={cycleTheme}>
+      <AppShell active="jeopardy" onNavigate={handleNavigate} onOpenLegal={(p) => setView(p)} theme={theme} onCycleTheme={cycleTheme}>
         <JeopardyHome onEdit={handleEditJeopardyBoard} onHost={handleHostJeopardy} />
       </AppShell>
     );
   if (view === 'home' || !deck || !settings)
     return (
-      <AppShell active={libraryMode} onNavigate={handleNavigate} theme={theme} onCycleTheme={cycleTheme}>
+      <AppShell active={libraryMode} onNavigate={handleNavigate} onOpenLegal={(p) => setView(p)} theme={theme} onCycleTheme={cycleTheme}>
         <DeckPicker
           decks={decks}
           onPick={handlePickDeck}
@@ -364,5 +369,13 @@ export default function App() {
       theme={theme}
       onCycleTheme={cycleTheme}
     />
+  );
+  })();
+
+  return (
+    <>
+      {screen}
+      <PrivacyNotice onOpenPrivacy={() => setView('privacy')} />
+    </>
   );
 }

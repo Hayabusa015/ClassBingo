@@ -29,9 +29,10 @@ const STATS = [
 
 interface Props {
   onNavigate: (mode: GameMode) => void;
+  onOpenLegal: (page: 'privacy' | 'terms') => void;
 }
 
-export default function LandingPage({ onNavigate }: Props) {
+export default function LandingPage({ onNavigate, onOpenLegal }: Props) {
   return (
     <main className="page page-landing">
       <section className="landing-hero">
@@ -104,6 +105,11 @@ export default function LandingPage({ onNavigate }: Props) {
       <footer className="landing-footer">
         <ShullLogo />
         <span>Built for the classroom by a science teacher.</span>
+        <span className="landing-footer-legal">
+          <button onClick={() => onOpenLegal('privacy')}>Privacy</button>
+          <span aria-hidden="true">·</span>
+          <button onClick={() => onOpenLegal('terms')}>Terms</button>
+        </span>
       </footer>
     </main>
   );

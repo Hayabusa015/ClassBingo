@@ -9,11 +9,12 @@ const MODE_ICON = { bingo: BingoIcon, memory: MemoryIcon, jeopardy: JeopardyIcon
 interface Props {
   active: NavTarget;
   onNavigate: (target: NavTarget) => void;
+  onOpenLegal: (page: 'privacy' | 'terms') => void;
   theme: Theme;
   onCycleTheme: () => void;
 }
 
-export default function Sidebar({ active, onNavigate, theme, onCycleTheme }: Props) {
+export default function Sidebar({ active, onNavigate, onOpenLegal, theme, onCycleTheme }: Props) {
   return (
     <nav className="sidebar" aria-label="Main navigation">
       <button className="sidebar-brand" onClick={() => onNavigate('landing')}>
@@ -52,6 +53,11 @@ export default function Sidebar({ active, onNavigate, theme, onCycleTheme }: Pro
       <div className="sidebar-footer">
         <UpdateChecker />
         <ThemeToggle theme={theme} onCycle={onCycleTheme} />
+      </div>
+      <div className="sidebar-legal">
+        <button onClick={() => onOpenLegal('privacy')}>Privacy</button>
+        <span aria-hidden="true">·</span>
+        <button onClick={() => onOpenLegal('terms')}>Terms</button>
       </div>
     </nav>
   );

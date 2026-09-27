@@ -17,6 +17,8 @@ export const THEME_LABEL: Record<Theme, string> = {
 
 export type View =
   | 'landing'
+  | 'privacy'
+  | 'terms'
   | 'home'
   | 'setup'
   | 'caller'
