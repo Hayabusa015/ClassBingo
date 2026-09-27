@@ -46,10 +46,10 @@ Each game runs `total_rounds` rounds, and each round runs these phases in order:
 1. **Repair** (`repair`, timed). Active players are shuffled into **sectors** of 3–5 students; the grouping changes every round. Each student answers questions one at a time on their device.
    - A correct answer adds **1 point to their sector** for this round and **+1 charge** to that student.
    - Ghosts are in no sector. Their correct answers add straight to the meter.
-2. **Resolve** (server-side, at the end of Repair). Every sector that a Glitch corrupted this round contributes **0 points**. Every clean sector contributes its points. The meter increases by the total.
+2. **Resolve** (server-side, folded into the `repair → alert` transition — not a phase of its own). Every sector that a Glitch corrupted this round contributes **0 points**. Every clean sector contributes its points. The meter increases by the total. The two Repair-time win checks (§2.5, #1–#2) are evaluated here, before Alert ever shows.
 3. **Alert** (`alert`, timed discussion). The projector shows the evidence: each sector's members and whether it was corrupted. The class discusses out loud.
-4. **Vote** (`vote`, timed). Each active student votes for one active student, or Skip. Votes are anonymous.
-5. **Reveal** (`reveal`). The projector shows the result. Whether the ejected student's role is revealed depends on the level. The host may **veto** the ejection here.
+4. **Vote** (`vote`, timed). Each active student votes for one active student, or Skip. Votes are anonymous. At the end of this phase the server tallies votes and ejects (or doesn't) — this is written into `reveal`'s state, but **no win check runs yet**.
+5. **Reveal** (`reveal`, **untimed / host-paced**, same pattern as L0's `intermission`). The projector shows who was ejected and, if the level allows, their role. **This is the veto window**: the host may call `glitch_veto_ejection` any time while still in `reveal`. Only when the host clicks **Next round** (`glitch_advance` from `reveal`) does the server evaluate the role-based win checks (§2.5, #3–#4), using the roster state *as it stands at that moment* — so a veto genuinely can prevent a spurious win or loss, not just annotate the record after the fact.
 
 ### 2.3 The "Scan" button: peek-proof sabotage
 Every student sees the **same screen**: a question, a charge counter, and a **Scan** button. Scanning costs charges.
@@ -65,13 +65,13 @@ A student peeking at a neighbor's screen therefore sees nothing different. Anyth
 - Students who don't vote are simply not counted.
 
 ### 2.5 Win conditions (Hidden Glitch)
-The server checks these in the order listed:
-1. After Resolve: if `meter >= meter_goal`, **Players win**.
-2. After Resolve in the **final round**: if `meter < meter_goal`, **Glitches win**. Skip Alert/Vote.
-3. After Reveal: if every Glitch is a Ghost, **Players win**.
-4. After Reveal: if active Glitches ≥ active Players, **Glitches win**.
+The server checks these in the order listed, split across two moments (see §2.2 step 5 for why #3–#4 wait for the host, not the vote):
+1. **At `repair → alert`** (resolve time): if `meter >= meter_goal`, **Players win** — skip Alert/Vote/Reveal entirely.
+2. **At `repair → alert`**, in the **final round**: if `meter < meter_goal`, **Glitches win** — skip Alert/Vote/Reveal entirely.
+3. **At `reveal → repair`** (when the host clicks Next round, after any veto): if there are zero active Glitches, **Players win**.
+4. **At `reveal → repair`**: if active Glitches ≥ active honest players (`activeCount − activeGlitchCount`), **Glitches win**.
 
-Otherwise the game continues to the next round's Repair.
+Otherwise the game continues to the next round's Repair. Checks always run active-vs-active, ghosts of either kind don't count toward either side.
 
 ### 2.6 Outbreak mode (Phase 3)
 - **Patient Zero:** 1 infected if players < 25, otherwise 2. Infected students can see each other in their role card.
@@ -252,6 +252,40 @@ alter publication supabase_realtime add table public.glitch_sessions, public.gli
 ```
 Also add an `updated_at` trigger on `glitch_sessions`, or set `updated_at = now()` in every RPC that updates it.
 
+> **As actually deployed in Phase 1** (verified live against `xxlrpkspkvukddhbluap`): `glitch_players` and `glitch_sessions` already carry every column this section anticipated needing early — `emblem int not null`, `locked boolean not null default false`, `paused_remaining_ms int` — and the `mode`, `phase`, `role`, and `winner` check constraints already enumerate the full Phase 2/3 vocabulary (`hunt`/`outbreak`, all 7 phases, `player`/`glitch`/`healthy`/`infected`, all 4 winners). **Not** deployed yet: `glitch_sabotages`, `glitch_votes`, or the `frame_target`/`shield_pending`/`infect_target` columns on `glitch_player_secrets` — matching this project's habit of not adding a column before a phase actually reads or writes it.
+
+#### 4.2b Phase 2 schema delta (new migration `glitch_phase2_schema`)
+Only what Hidden Glitch (L1–L2) actually needs. `kind` on sabotages is scoped to `'corrupt'` only — Phase 3 adds `'expose'` via `alter table … add column` when Outbreak needs it, rather than reserving the value now.
+```sql
+create table public.glitch_sabotages (
+  id bigserial primary key,
+  session_id uuid not null references public.glitch_sessions(id) on delete cascade,
+  player_id uuid not null references public.glitch_players(id) on delete cascade,
+  round int not null,
+  target_sector int not null,
+  created_at timestamptz not null default now()
+);
+create index on public.glitch_sabotages (session_id, round);
+
+create table public.glitch_votes (
+  session_id uuid not null references public.glitch_sessions(id) on delete cascade,
+  round int not null,
+  voter_id uuid not null references public.glitch_players(id) on delete cascade,
+  target_id uuid references public.glitch_players(id) on delete cascade, -- null = skip
+  created_at timestamptz not null default now(),
+  primary key (session_id, round, voter_id)
+);
+
+alter table public.glitch_player_secrets
+  add column streak int not null default 0,
+  add column best_streak int not null default 0;
+
+alter table public.glitch_sabotages enable row level security;
+alter table public.glitch_votes enable row level security;
+-- zero policies on either — same "secret table" pattern as the rest.
+```
+Both new tables stay **off** the `supabase_realtime` publication — nothing about them is ever read directly by a client, only through RPCs.
+
 ### 4.3 RPCs
 Each RPC starts with `glitch_check_host(...)` or `glitch_check_player(...)`, modeled on `jeopardy_check_host` and `jeopardy_check_player` (read them with `pg_get_functiondef`). Use `select … for update` on the session row whenever the RPC reads, then writes, phase or meter state. That is what serializes races (it's how `jeopardy_buzz` guarantees fair buzz order).
 
@@ -283,20 +317,56 @@ Each RPC starts with `glitch_check_host(...)` or `glitch_check_player(...)`, mod
 
 **Shield questions (outbreak):** in `glitch_next_question`, when `shield_pending` is true, set it back to false and mark the served question internally as a shield. Track this with a column such as `current_is_shield boolean`; add it to `glitch_player_secrets`.
 
-### 4.4 `last_result` (public JSON written at resolve/reveal)
+#### 4.3b Phase 2 implementation notes (grounded in the deployed Phase 1 functions)
+
+**Untouched by Phase 2:** `glitch_next_question` and `glitch_submit_answer` need **zero changes**. Their existing rule — `if sector is null then meter += 1 directly, else just record the answer` — already generalizes: in L0 every active player has `sector = null` (direct add), and once Phase 2 starts populating `sector` for hunt-mode players, only Ghosts keep `sector = null`, so they alone still add directly. Sectored players' correct answers just accumulate in `glitch_answers` until Resolve tallies them. This is the payoff of the "sector-null-means-direct-add" design called out when Phase 1 shipped.
+
+**`glitch_begin_repair` gains role-aware sector assignment**, gated on `(settings->>'hiddenRoles')::boolean`. L0 keeps today's behavior exactly (every `sector` stays null). For hunt/outbreak:
+```sql
+v_sector_count := greatest(1, ceil(active_count::numeric / 4));
+-- Walk active players ordered "glitches first (each shuffled by random()), then everyone else (shuffled)"
+-- and deal them round-robin into v_sector_count buckets via a running cursor:
+--   sector := (cursor % v_sector_count) + 1; cursor := cursor + 1;
+-- Putting glitches first in that ordering means they land in *different* buckets
+-- (0, 1, 2, ... mod sector_count) before honest players start filling in behind them —
+-- the simplest ordering that satisfies "spread Glitches across sectors whenever the count allows it."
+```
+This also means sectors are reassigned on **every** call to `glitch_begin_repair`, i.e. every round — matching "the grouping changes every round" in §2.2.
+
+**`glitch_start_game` gains role assignment**, before its existing `glitch_begin_repair` call: when `hiddenRoles` is true, pick `glitchCount(level, activeCount)` active player ids at random (`order by random() limit n`) and set their `role = 'glitch'`; use `honestCount = activeCount - glitchCount` (instead of `activeCount`) in the meter-goal formula. `glitchCount()` needs a SQL mirror of the pure `glitchCount()` helper in `glitch.ts` — keep both in sync the same way `computeMeterGoal()` already has a documented JS/SQL parity requirement, and cover it with the same kind of parity test.
+
+**`glitch_advance` grows two new phase branches and the `repair` branch forks on `hiddenRoles`:**
+- `repair` (hunt/outbreak fork): tally correct answers per sector (`glitch_answers` grouped by `sector`, `round = current`), mark a sector `corrupted` if it has any row in `glitch_sabotages` for that `session_id + round + target_sector`, sum points from **un**corrupted sectors, add the Ghosts' direct total on top, write `last_result = {round, meterGained, sectors: [{sector, playerIds, corrupted}, …]}`, then run win checks #1–#2 (§2.5) → `ended` or → `alert` with `phase_ends_at = now() + discussionSeconds`.
+- `alert` → `vote`, `phase_ends_at = now() + voteSeconds`.
+- `vote` → tally with the **same tie/skip logic as the pure `tallyVotes()` helper** (plurality; a tie at the top or Skip ≥ the leader means no ejection), set the ejected player's `status = 'ghost'` and `sector = null` if any, **merge** (`last_result || jsonb_build_object(...)`, not overwrite — Resolve's `sectors`/`meterGained` must survive) in `{votes, ejectedId, ejectedWasHidden, vetoed: false}`, then move to `reveal` **with no `phase_ends_at`** (host-paced, like `intermission`).
+- `reveal` → run win checks #3–#4 (§2.5) against the *current* roster (after any veto) → `ended`, or `glitch_begin_repair` for the next round.
+
+**New RPCs**, all following the existing `check_host`/`check_player` + `for update` pattern:
+| RPC | Behavior |
+|---|---|
+| `glitch_my_state(p_session_id, p_player_id, p_player_secret)` → `jsonb` | `{role, charges, scanCost, streak, bestStreak}`. The only way a student learns their role. Fetched on mount and on refresh-recovery; `charges`/`streak` also arrive incrementally via `glitch_submit_answer`'s response, this is just the source of truth on (re)load. |
+| `glitch_scan(p_session_id, p_player_id, p_player_secret)` → `{removedChoice, charges}` | Requires `phase='repair'`, not paused, an open (`current_question_id is not null`) and unexpired current question, `charges >= scanCost`, and at least 3 still-visible choices (`totalChoices - array_length(removed_choices,1) > 2`) so a hint never collapses the question to one option. Deducts `scanCost`, appends a random not-yet-removed wrong index to `removed_choices`. **Then, only for `role='glitch'`:** insert one row into `glitch_sabotages` (`target_sector` = the scanning player's own sector — L3's frame targeting is Phase 3). The response shape is identical for every role; nothing distinguishes a Glitch's call from a Player's. |
+| `glitch_cast_vote(p_session_id, p_player_id, p_player_secret, p_target_id uuid \| null)` → `void` | Requires `phase='vote'` and the caller `status='active'`; `null` means Skip. If `p_target_id` is set, it must be an `active` player in the same session. Upserts on the `(session_id, round, voter_id)` primary key, so a changed mind before time's up just overwrites. |
+| `glitch_vote_count(p_session_id, p_host_secret)` → `int` | Host-only (matches its listing as a Host RPC) — count of rows in `glitch_votes` for the session's current round. Reveals a count only, never who voted for whom. Powers the projector's "X / Y votes in" and the "N haven't voted" nudge (§10.3). |
+| `glitch_veto_ejection(p_session_id, p_host_secret)` → `void` | Requires `phase='reveal'`, `last_result->>'ejectedId'` not null, and not already vetoed. Restores that player's `status='active'` and merges `{vetoed: true}` into `last_result`. Because the reveal→repair win checks (#3–#4) run *after* this is possible, a veto can genuinely change the outcome, not just annotate history after the fact. |
+
+### 4.4 `last_result` (public JSON, written in two stages that **merge**, not overwrite)
+`repair → alert` writes the first shape below; `vote → reveal` merges (`last_result || jsonb_build_object(...)`) the second shape on top, so a client reading `last_result` during `reveal` sees both at once. This merge is a deliberate change from Phase 1, where `last_result` was always a single full replace (fine for L0, which only ever writes it once per round).
 ```jsonc
+// written at repair → alert (or repair → intermission for L0, unchanged)
 {
   "round": 2,
   "meterGained": 41,
-  // hunt only — built at resolve:
-  "sectors": [ { "sector": 1, "playerIds": ["…","…"], "corrupted": true }, … ],
-  // outbreak only — built at resolve:
-  "newInfections": 1,
-  // built at reveal:
+  // hunt only:
+  "sectors": [ { "sector": 1, "playerIds": ["…","…"], "corrupted": true }, … ]
+  // outbreak only (Phase 3): "newInfections": 1
+}
+// merged in at vote → reveal:
+{
   "votes": [ { "targetId": "…", "count": 5 }, { "targetId": null, "count": 3 } ],
   "ejectedId": "…" | null,
-  "ejectedWasHidden": true | false | null,   // null when level hides roles
-  "vetoed": false
+  "ejectedWasHidden": true | false | null,   // null when nobody was ejected, or the level hides roles (L3)
+  "vetoed": false                            // flips to true if the host calls glitch_veto_ejection
 }
 ```
 
@@ -441,11 +511,17 @@ Commit after each phase with a clear message. Each phase lists its acceptance cr
 - ✅ **Acceptance:** a SQL script plays a full 2-round L0 game, including a pause/resume and a locked-room join rejection; the meter reaches its goal and `winner` is set. The UI renders in all themes. Tests and build pass.
 
 ### Phase 2: Hidden Glitch, Levels 1–2
-- **Tables:** add `glitch_sabotages` and `glitch_votes`.
-- **Game logic:** roles, sectors, Scan (hint + corrupt), resolve with sector wiping, alert evidence, voting, reveal, veto, ghosts, and every win check in §2.5.
-- **RPCs:** `my_state`, `scan`, `cast_vote`, `vote_count`, `veto_ejection`.
-- **UI:** hold-to-peek role card, charges + Scan, alert board, vote screen, reveal, ghost state, plus every **[P2]** item in §10 (private streaks, detective notes, evidence/vote reveals, result lines, unmask grid…).
-- ✅ **Acceptance:** a 3-streak grants the bonus charge. SQL scripts cover (a) Players winning by ejecting the Glitch, (b) Glitches winning when the meter falls short, (c) a veto restoring a student, and (d) `anon` being unable to read any role, vote, or sabotage. Scan responses are byte-for-byte identical in shape for Player and Glitch.
+- **Schema:** apply `glitch_phase2_schema` (§4.2b) — `glitch_sabotages`, `glitch_votes`, `streak`/`best_streak` on `glitch_player_secrets`. No other tables or columns.
+- **RPC changes:** rewrite `glitch_begin_repair` (role-aware sector assignment), `glitch_start_game` (role assignment + honest-count-based meter goal), `glitch_advance` (the four new phase branches in §4.3b); add `glitch_my_state`, `glitch_scan`, `glitch_cast_vote`, `glitch_vote_count`, `glitch_veto_ejection`. `glitch_next_question` and `glitch_submit_answer` are unchanged — confirm that explicitly in review rather than re-deriving their logic.
+- **Streak bonus in `glitch_submit_answer`:** on a correct answer, `streak += 1` (reset to 0 on wrong), `best_streak := greatest(best_streak, streak)`, and every `streak % 3 == 0` grants **+1 bonus charge** on top of the normal +1 — so a 3-streak's third correct answer nets +2 charges that call. Return `streak`/`bestStreak` in the response (extends `GlitchAnswerResult`).
+- **UI:** hold-to-peek role card, charge pips + Scan (with the affordability ring), alert board (evidence reveal), vote screen with a live selection + "vote locked" state, reveal screen with a Veto button (visible only while `phase='reveal'` and `ejectedId` isn't null and not yet vetoed), ghost state, plus every **[P2]** item in §10 (level cards for L1/L2, glitches-remaining counter, lobby tips, private streaks, detective notes, evidence/vote reveals, result lines, vote nudge, role unmask grid, student end-of-round summary…).
+- ✅ **Acceptance** (SQL scripts against the live project, mirroring Phase 1's approach):
+  1. A 6+ student L1 game where the class ejects the actual Glitch: `ejectedWasHidden = true`, the next `reveal → repair` win check finds zero active Glitches, `winner = 'players'`.
+  2. A game where the meter falls short in the final round: winner is set at `repair → alert` (`glitches`), and Alert/Vote/Reveal are skipped entirely for that round (phase goes straight to `ended`).
+  3. A wrongful ejection followed by `glitch_veto_ejection`, then `glitch_advance` from `reveal`: the vetoed player is `active` again *before* the win check runs, and the check's outcome reflects that (i.e. construct a case where the veto is the only thing standing between "everyone's a ghost but one honest player" and a Glitch win).
+  4. A 3-answer-streak grants exactly one bonus charge on the 3rd correct answer, verified against `glitchCount()`'s SQL mirror and `computeMeterGoal()`'s existing parity pattern — add a matching parity check for `tallyVotes()` against the SQL vote-tally query (tie-at-top and Skip-wins-the-tie cases specifically).
+  5. `anon` reading `glitch_sabotages` or `glitch_votes` directly returns zero rows (RLS, no policies) — same check pattern as the existing three secret tables.
+  6. `glitch_scan`'s response shape (`{removedChoice, charges}`) is byte-for-byte identical for a `role='player'` caller and a `role='glitch'` caller in the same round; only a direct read of `glitch_sabotages` (as an internal SQL check, never as a client) shows the difference.
 
 ### Phase 3: Level 3 + Outbreak
 - **L3:** hidden role on ejection, framing a neighbor sector, tag-matched distractors.
