@@ -15,11 +15,20 @@ export const THEME_LABEL: Record<Theme, string> = {
   contrast: 'High contrast',
 };
 
-export type View = 'home' | 'setup' | 'caller' | 'cardgen' | 'memory-setup' | 'memory-play';
+export type View =
+  | 'home'
+  | 'setup'
+  | 'caller'
+  | 'cardgen'
+  | 'memory-setup'
+  | 'memory-play'
+  | 'jeopardy-home'
+  | 'jeopardy-builder'
+  | 'jeopardy-host';
 
-export type GameMode = 'bingo' | 'memory';
-export const GAME_MODES: GameMode[] = ['bingo', 'memory'];
-export const GAME_MODE_LABEL: Record<GameMode, string> = { bingo: 'Bingo', memory: 'Memory' };
+export type GameMode = 'bingo' | 'memory' | 'jeopardy';
+export const GAME_MODES: GameMode[] = ['bingo', 'memory', 'jeopardy'];
+export const GAME_MODE_LABEL: Record<GameMode, string> = { bingo: 'Bingo', memory: 'Memory', jeopardy: 'Jeopardy' };
 
 export interface SessionState {
   view: View;

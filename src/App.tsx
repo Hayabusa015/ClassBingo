@@ -8,6 +8,8 @@ import { SESSION_KEY, THEME_ORDER } from './lib/gameConfig';
 import { loadState, saveState, clearState } from './lib/storage';
 import { randomGameCode } from './lib/rng';
 import type { MemorySettings } from './lib/memory';
+import type { HostCredentials, JeopardyBoard } from './lib/jeopardy';
+import { createSession as createJeopardySession, saveHostSession, loadHostSession, clearHostSession } from './lib/jeopardy';
 import {
   readLibrary,
   writeLibrary,
@@ -24,6 +26,9 @@ import CardGenerator from './components/CardGenerator';
 import CustomPlayset from './components/CustomPlayset';
 import MemorySetup from './components/MemorySetup';
 import MemoryGame from './components/MemoryGame';
+import JeopardyHome from './components/JeopardyHome';
+import JeopardyBoardBuilder from './components/JeopardyBoardBuilder';
+import JeopardyHost from './components/JeopardyHost';
 
 function defaultSettingsFor(deck: DeckConfig): GameSettings {
   const count = getFilteredItems(deck, deck.defaultFilterId).length;
@@ -40,8 +45,11 @@ function defaultSettingsFor(deck: DeckConfig): GameSettings {
 export default function App() {
   const [libraryState, setLibraryState] = useState(readLibrary);
   const library = libraryState.playsets;
-  const [view, setView] = useState<View>('home');
+  const [view, setView] = useState<View>(() => (loadHostSession() ? 'jeopardy-host' : 'home'));
   const [libraryMode, setLibraryMode] = useState<GameMode>('bingo');
+  const [jeopardyBoardId, setJeopardyBoardId] = useState<string | undefined>();
+  const [jeopardyEditingBoard, setJeopardyEditingBoard] = useState<JeopardyBoard | null>(null);
+  const [jeopardyHostCreds, setJeopardyHostCreds] = useState<HostCredentials | null>(() => loadHostSession());
   const [creating, setCreating] = useState(false);
   const [creationTitle, setCreationTitle] = useState('');
   const [deckId, setDeckId] = useState<DeckId | null>(null);
@@ -141,6 +149,29 @@ export default function App() {
     setMemoryActiveCustom(undefined);
     setMemorySettings(null);
   };
+  const handleChangeLibraryMode = (mode: GameMode) => {
+    if (mode === 'jeopardy') {
+      setView('jeopardy-home');
+      return;
+    }
+    setLibraryMode(mode);
+  };
+  const handleEditJeopardyBoard = (id: string | undefined, board: JeopardyBoard) => {
+    setJeopardyBoardId(id);
+    setJeopardyEditingBoard(board);
+    setView('jeopardy-builder');
+  };
+  const handleHostJeopardy = async (board: JeopardyBoard) => {
+    const creds = await createJeopardySession(board);
+    saveHostSession(creds);
+    setJeopardyHostCreds(creds);
+    setView('jeopardy-host');
+  };
+  const exitJeopardyHost = () => {
+    clearHostSession();
+    setJeopardyHostCreds(null);
+    setView('jeopardy-home');
+  };
   const exportLibrary = () => {
     const blob = new Blob(
       [JSON.stringify({ format: 'classbingo-library', version: 1, playsets: library }, null, 2)],
@@ -230,13 +261,38 @@ export default function App() {
         onCycleTheme={cycleTheme}
       />
     );
+  if (view === 'jeopardy-host' && jeopardyHostCreds)
+    return (
+      <JeopardyHost credentials={jeopardyHostCreds} onExit={exitJeopardyHost} theme={theme} onCycleTheme={cycleTheme} />
+    );
+  if (view === 'jeopardy-builder' && jeopardyEditingBoard)
+    return (
+      <JeopardyBoardBuilder
+        initialBoard={jeopardyEditingBoard}
+        boardId={jeopardyBoardId}
+        onBack={() => setView('jeopardy-home')}
+        onHost={handleHostJeopardy}
+        theme={theme}
+        onCycleTheme={cycleTheme}
+      />
+    );
+  if (view === 'jeopardy-home')
+    return (
+      <JeopardyHome
+        onEdit={handleEditJeopardyBoard}
+        onHost={handleHostJeopardy}
+        onBack={handleBackToHome}
+        theme={theme}
+        onCycleTheme={cycleTheme}
+      />
+    );
   if (view === 'home' || !deck || !settings)
     return (
       <DeckPicker
         decks={decks}
         onPick={handlePickDeck}
         mode={libraryMode}
-        onChangeMode={setLibraryMode}
+        onChangeMode={handleChangeLibraryMode}
         onCreate={(title = '') => {
           setCreationTitle(title);
           setCreating(true);
