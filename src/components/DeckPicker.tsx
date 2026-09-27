@@ -1,24 +1,18 @@
 import { useRef, useState } from 'react';
 import type { DeckConfig, DeckId } from '../data/types';
-import type { GameMode, Theme } from '../lib/gameConfig';
-import { GAME_MODES, GAME_MODE_LABEL } from '../lib/gameConfig';
-import ThemeToggle from './ThemeToggle';
-import UpdateChecker from './UpdateChecker';
+import type { GameMode } from '../lib/gameConfig';
+import { GAME_MODE_LABEL, GAME_MODE_TAGLINE } from '../lib/gameConfig';
 import ScienceArt from './ScienceArt';
-import ShullLogo from './ShullLogo';
 
 interface Props {
   decks: DeckConfig[];
   onPick: (deckId: DeckId) => void;
   mode: GameMode;
-  onChangeMode: (mode: GameMode) => void;
   onCreate: (title?: string) => void;
   onExport: () => void;
   onImport: (file: File) => Promise<void>;
   onRemove: (id: DeckId) => void;
   storageError: string | null;
-  theme: Theme;
-  onCycleTheme: () => void;
   resumeBanner?: { label: string; onResume: () => void; onDiscard: () => void } | null;
 }
 const SUBJECT_MARK: Record<string, string> = {
@@ -37,14 +31,11 @@ export default function DeckPicker({
   decks,
   onPick,
   mode,
-  onChangeMode,
   onCreate,
   onExport,
   onImport,
   onRemove,
   storageError,
-  theme,
-  onCycleTheme,
   resumeBanner,
 }: Props) {
   const [query, setQuery] = useState('');
@@ -65,18 +56,12 @@ export default function DeckPicker({
   );
   return (
     <main className="page page-home page-library">
-      <div className="page-corner-controls">
-        <UpdateChecker />
-        <ThemeToggle theme={theme} onCycle={onCycleTheme} />
-      </div>
-      <header className="home-header">
-        <ShullLogo />
+      <header className="shell-page-header">
         <span className="home-eyebrow">
-          <span className="status-spark" /> YOUR CLASSROOM. YOUR GAME.
+          <span className="status-spark" /> {mode === 'memory' ? 'MATCHING GAME' : 'CLASSROOM REVIEW GAME'}
         </span>
-        <h1>StudyArcade</h1>
-        <p className="home-tagline">Insert coin. Choose your game. Own the leaderboard.</p>
-        <p className="subtitle">Choose a subject, tailor the items, and make it your game.</p>
+        <h1>{GAME_MODE_LABEL[mode]}</h1>
+        <p className="subtitle">{GAME_MODE_TAGLINE[mode]}</p>
       </header>
       {resumeBanner && (
         <div className="resume-banner">
@@ -98,19 +83,6 @@ export default function DeckPicker({
             <p>
               {decks.length - savedCount} ready-made playsets · {savedCount} saved by you
             </p>
-          </div>
-          <div className="mode-tabs segmented" role="tablist" aria-label="Game mode">
-            {GAME_MODES.map((m) => (
-              <button
-                key={m}
-                role="tab"
-                aria-selected={mode === m}
-                className={`segmented-btn ${mode === m ? 'active' : ''}`}
-                onClick={() => onChangeMode(m)}
-              >
-                {GAME_MODE_LABEL[m]}
-              </button>
-            ))}
           </div>
           <button className="btn btn-primary" onClick={() => onCreate(query.trim().slice(0, 80))}>
             + Create playset

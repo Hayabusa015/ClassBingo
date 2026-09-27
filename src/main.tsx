@@ -10,6 +10,7 @@ import './styles/caller-stage.css';
 import './styles/library.css';
 import './styles/memory.css';
 import './styles/jeopardy.css';
+import './styles/shell.css';
 import './styles/print.css';
 
 const root = document.getElementById('root');

@@ -1121,6 +1121,39 @@
   box-shadow: 0 0 14px var(--glow-cyan);
 }
 
+/* Sidebar + landing page: same restrained neon treatment as the rest of
+   the arcade theme — glow accents on the active state and key numbers,
+   plain text everywhere else so long headlines stay legible. */
+:root[data-theme='arcade'] .sidebar {
+  border-right-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+}
+:root[data-theme='arcade'] .sidebar-brand-mark {
+  box-shadow: 0 0 16px var(--glow-violet);
+}
+:root[data-theme='arcade'] .sidebar-nav-item.active {
+  color: var(--text);
+  box-shadow: inset 2px 0 0 var(--accent-strong), 0 0 14px var(--glow-pink);
+}
+:root[data-theme='arcade'] .sidebar-nav-item.active svg {
+  color: var(--accent-strong);
+}
+:root[data-theme='arcade'] .landing-stat-value {
+  text-shadow: 0 0 16px var(--glow-pink);
+}
+:root[data-theme='arcade'] .landing-mode-icon {
+  color: var(--accent-cyan);
+  box-shadow: 0 0 0 1px var(--accent-cyan) inset;
+  background: var(--glow-cyan);
+}
+:root[data-theme='arcade'] .landing-mode-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  box-shadow: 0 0 24px var(--glow-violet);
+}
+:root[data-theme='arcade'] .landing-closing {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  box-shadow: 0 0 34px var(--glow-violet);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .caller-main,

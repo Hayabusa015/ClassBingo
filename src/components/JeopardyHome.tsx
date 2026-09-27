@@ -1,18 +1,14 @@
 import { useState } from 'react';
 import type { JeopardyBoard, SavedJeopardyBoard } from '../lib/jeopardy';
 import { readBoardLibrary, deleteBoard, emptyBoard } from '../lib/jeopardy';
-import type { Theme } from '../lib/gameConfig';
-import ThemeToggle from './ThemeToggle';
+import { GAME_MODE_TAGLINE } from '../lib/gameConfig';
 
 interface Props {
   onEdit: (id: string | undefined, board: JeopardyBoard) => void;
   onHost: (board: JeopardyBoard) => Promise<void>;
-  onBack: () => void;
-  theme: Theme;
-  onCycleTheme: () => void;
 }
 
-export default function JeopardyHome({ onEdit, onHost, onBack, theme, onCycleTheme }: Props) {
+export default function JeopardyHome({ onEdit, onHost }: Props) {
   const [boards, setBoards] = useState<SavedJeopardyBoard[]>(readBoardLibrary);
   const [removing, setRemoving] = useState<string | null>(null);
   const [hostingId, setHostingId] = useState<string | null>(null);
@@ -32,15 +28,12 @@ export default function JeopardyHome({ onEdit, onHost, onBack, theme, onCycleThe
 
   return (
     <main className="page page-home page-jeopardy-home">
-      <div className="page-corner-controls">
-        <ThemeToggle theme={theme} onCycle={onCycleTheme} />
-      </div>
-      <header className="home-header">
+      <header className="shell-page-header">
         <span className="home-eyebrow">
           <span className="status-spark" /> LIVE CLASSROOM GAME
         </span>
         <h1>Jeopardy</h1>
-        <p className="subtitle">Build a board, then host it live — students join from their own device.</p>
+        <p className="subtitle">{GAME_MODE_TAGLINE.jeopardy}</p>
       </header>
 
       <section className="library-controls" aria-label="Jeopardy boards">
@@ -122,12 +115,6 @@ export default function JeopardyHome({ onEdit, onHost, onBack, theme, onCycleThe
           </button>
         </div>
       )}
-
-      <footer className="home-footer">
-        <button className="btn btn-ghost" onClick={onBack}>
-          ← Back to StudyArcade
-        </button>
-      </footer>
     </main>
   );
 }

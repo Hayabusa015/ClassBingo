@@ -3,7 +3,7 @@ import { DECK_ORDER, getDeck, findDeck } from './data/decks';
 import type { DeckConfig, DeckId } from './data/types';
 import { getFilteredItems, type GameSettings } from './lib/cards';
 import type { WinPattern } from './lib/bingo';
-import type { CallStyle, GameMode, SessionState, Theme, View } from './lib/gameConfig';
+import type { CallStyle, GameMode, NavTarget, SessionState, Theme, View } from './lib/gameConfig';
 import { SESSION_KEY, THEME_ORDER } from './lib/gameConfig';
 import { loadState, saveState, clearState } from './lib/storage';
 import { randomGameCode } from './lib/rng';
@@ -19,6 +19,8 @@ import {
   playsetToDeck,
   type SavedPlayset,
 } from './lib/playsets';
+import AppShell from './components/AppShell';
+import LandingPage from './components/LandingPage';
 import DeckPicker from './components/DeckPicker';
 import GameSetup from './components/GameSetup';
 import Caller from './components/Caller';
@@ -45,7 +47,7 @@ function defaultSettingsFor(deck: DeckConfig): GameSettings {
 export default function App() {
   const [libraryState, setLibraryState] = useState(readLibrary);
   const library = libraryState.playsets;
-  const [view, setView] = useState<View>(() => (loadHostSession() ? 'jeopardy-host' : 'home'));
+  const [view, setView] = useState<View>(() => (loadHostSession() ? 'jeopardy-host' : 'landing'));
   const [libraryMode, setLibraryMode] = useState<GameMode>('bingo');
   const [jeopardyBoardId, setJeopardyBoardId] = useState<string | undefined>();
   const [jeopardyEditingBoard, setJeopardyEditingBoard] = useState<JeopardyBoard | null>(null);
@@ -149,12 +151,17 @@ export default function App() {
     setMemoryActiveCustom(undefined);
     setMemorySettings(null);
   };
-  const handleChangeLibraryMode = (mode: GameMode) => {
-    if (mode === 'jeopardy') {
+  const handleNavigate = (target: NavTarget) => {
+    if (target === 'landing') {
+      setView('landing');
+      return;
+    }
+    if (target === 'jeopardy') {
       setView('jeopardy-home');
       return;
     }
-    setLibraryMode(mode);
+    setLibraryMode(target);
+    setView('home');
   };
   const handleEditJeopardyBoard = (id: string | undefined, board: JeopardyBoard) => {
     setJeopardyBoardId(id);
@@ -276,46 +283,47 @@ export default function App() {
         onCycleTheme={cycleTheme}
       />
     );
+  if (view === 'landing')
+    return (
+      <AppShell active="landing" onNavigate={handleNavigate} theme={theme} onCycleTheme={cycleTheme}>
+        <LandingPage onNavigate={handleNavigate} />
+      </AppShell>
+    );
   if (view === 'jeopardy-home')
     return (
-      <JeopardyHome
-        onEdit={handleEditJeopardyBoard}
-        onHost={handleHostJeopardy}
-        onBack={handleBackToHome}
-        theme={theme}
-        onCycleTheme={cycleTheme}
-      />
+      <AppShell active="jeopardy" onNavigate={handleNavigate} theme={theme} onCycleTheme={cycleTheme}>
+        <JeopardyHome onEdit={handleEditJeopardyBoard} onHost={handleHostJeopardy} />
+      </AppShell>
     );
   if (view === 'home' || !deck || !settings)
     return (
-      <DeckPicker
-        decks={decks}
-        onPick={handlePickDeck}
-        mode={libraryMode}
-        onChangeMode={handleChangeLibraryMode}
-        onCreate={(title = '') => {
-          setCreationTitle(title);
-          setCreating(true);
-        }}
-        onExport={exportLibrary}
-        onImport={importLibrary}
-        onRemove={removePlayset}
-        storageError={libraryState.error}
-        theme={theme}
-        onCycleTheme={cycleTheme}
-        resumeBanner={
-          resumable
-            ? {
-                label: `Resume your ${resumable.customPlayset?.title ?? findDeck(resumable.deckId)?.title ?? 'saved'} game (code ${resumable.settings.gameCode})?`,
-                onResume: handleResume,
-                onDiscard: () => {
-                  clearState(SESSION_KEY);
-                  setResumable(null);
-                },
-              }
-            : null
-        }
-      />
+      <AppShell active={libraryMode} onNavigate={handleNavigate} theme={theme} onCycleTheme={cycleTheme}>
+        <DeckPicker
+          decks={decks}
+          onPick={handlePickDeck}
+          mode={libraryMode}
+          onCreate={(title = '') => {
+            setCreationTitle(title);
+            setCreating(true);
+          }}
+          onExport={exportLibrary}
+          onImport={importLibrary}
+          onRemove={removePlayset}
+          storageError={libraryState.error}
+          resumeBanner={
+            resumable
+              ? {
+                  label: `Resume your ${resumable.customPlayset?.title ?? findDeck(resumable.deckId)?.title ?? 'saved'} game (code ${resumable.settings.gameCode})?`,
+                  onResume: handleResume,
+                  onDiscard: () => {
+                    clearState(SESSION_KEY);
+                    setResumable(null);
+                  },
+                }
+              : null
+          }
+        />
+      </AppShell>
     );
   if (view === 'setup')
     return (
