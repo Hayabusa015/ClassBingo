@@ -124,9 +124,9 @@
   .last-five-chip.current { background: var(--accent-soft); }
   .winner-check-input-row .text-input { width: 100%; min-width: 0; }
   .winner-check-banner.win { border: 1px solid var(--accent); box-shadow: 0 0 25px var(--accent-soft); animation: screen-enter .5s var(--ease-out); }
-  :root[data-theme='violet'] .deck-tile { background: linear-gradient(155deg, var(--accent-soft), transparent 58%), var(--bg-card); }
-  :root[data-theme='violet'] .call-card { background: radial-gradient(ellipse at 50% 110%, var(--accent-soft), transparent 65%), var(--bg-card); }
-  :root[data-theme='violet'] .element-tile { box-shadow: 0 0 28px color-mix(in srgb, currentColor 22%, transparent), 0 0 0 1px currentColor inset; }
+  :root[data-theme='arcade'] .deck-tile { background: linear-gradient(155deg, var(--accent-soft), transparent 58%), var(--bg-card); }
+  :root[data-theme='arcade'] .call-card { background: radial-gradient(ellipse at 50% 110%, var(--accent-soft), transparent 65%), var(--bg-card); }
+  :root[data-theme='arcade'] .element-tile { box-shadow: 0 0 28px color-mix(in srgb, currentColor 22%, transparent), 0 0 0 1px currentColor inset; }
   :root[data-theme='contrast'] .science-art { filter: none; }
   :root[data-theme='contrast'] .deck-tile, :root[data-theme='contrast'] .call-card { background: var(--bg-card); box-shadow: none; }
 

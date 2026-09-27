@@ -6,10 +6,10 @@ import type { SavedPlayset } from './playsets';
 /** 'both' shows name+symbol/formula together; 'challenge' shows only the side not on student cards. */
 export type CallStyle = 'both' | 'challenge';
 
-export type Theme = 'violet' | 'dark' | 'light' | 'contrast';
-export const THEME_ORDER: Theme[] = ['violet', 'dark', 'light', 'contrast'];
+export type Theme = 'arcade' | 'dark' | 'light' | 'contrast';
+export const THEME_ORDER: Theme[] = ['arcade', 'dark', 'light', 'contrast'];
 export const THEME_LABEL: Record<Theme, string> = {
-  violet: 'Violet',
+  arcade: 'Arcade',
   dark: 'Dark',
   light: 'Light',
   contrast: 'High contrast',

@@ -1014,34 +1014,37 @@
   font-size: 0.85rem;
 }
 
-/* ===== Violet theme signature treatments ("Element Violet") ===== */
-:root[data-theme='violet'] .home-header h1 {
+/* ===== Arcade theme signature treatments ("Retro Arcade" — synthwave neon) ===== */
+:root[data-theme='arcade'] .home-header h1 {
+  font-family: var(--font-arcade);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 28px var(--glow-violet));
+  filter: drop-shadow(0 0 28px var(--glow-violet)) drop-shadow(0 0 14px var(--glow-cyan));
 }
 
-:root[data-theme='violet'] .btn-primary {
+:root[data-theme='arcade'] .btn-primary {
   background: var(--accent-gradient);
   border-color: transparent;
   color: #fff;
   box-shadow: 0 4px 20px var(--glow-violet);
 }
-:root[data-theme='violet'] .btn-primary:hover:not(:disabled) {
+:root[data-theme='arcade'] .btn-primary:hover:not(:disabled) {
   box-shadow: 0 6px 28px var(--glow-pink);
 }
 
 /* Glowing gradient-ring border on the two hero cards, via a masked pseudo-
    element (a solid border-color can't be a gradient with rounded corners). */
-:root[data-theme='violet'] .deck-tile,
-:root[data-theme='violet'] .call-card {
+:root[data-theme='arcade'] .deck-tile,
+:root[data-theme='arcade'] .call-card {
   position: relative;
   border-color: transparent;
 }
-:root[data-theme='violet'] .deck-tile::before,
-:root[data-theme='violet'] .call-card::before {
+:root[data-theme='arcade'] .deck-tile::before,
+:root[data-theme='arcade'] .call-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -1056,42 +1059,66 @@
   mask-composite: exclude;
   pointer-events: none;
 }
-:root[data-theme='violet'] .deck-tile:hover::before {
+:root[data-theme='arcade'] .deck-tile:hover::before {
   opacity: 1;
 }
-:root[data-theme='violet'] .deck-tile:hover {
+:root[data-theme='arcade'] .deck-tile:hover {
   box-shadow: 0 0 0 1px var(--glow-violet), 0 16px 44px var(--glow-violet);
 }
 
-:root[data-theme='violet'] .setup-card,
-:root[data-theme='violet'] .called-board,
-:root[data-theme='violet'] .called-list,
-:root[data-theme='violet'] .winner-check,
-:root[data-theme='violet'] .resume-banner,
-:root[data-theme='violet'] .cardgen-controls {
+:root[data-theme='arcade'] .setup-card,
+:root[data-theme='arcade'] .called-board,
+:root[data-theme='arcade'] .called-list,
+:root[data-theme='arcade'] .winner-check,
+:root[data-theme='arcade'] .resume-banner,
+:root[data-theme='arcade'] .cardgen-controls {
   border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
   backdrop-filter: blur(10px);
 }
 
 /* Neon periodic-table tile — keeps each category's own color (still
    functional) but gives it the reference card's glowing-card treatment. */
-:root[data-theme='violet'] .element-tile {
+:root[data-theme='arcade'] .element-tile {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), transparent 60%), var(--bg-tile);
   box-shadow: 0 0 34px currentColor, 0 0 0 1px currentColor inset;
 }
 
-:root[data-theme='violet'] .ion-headline,
-:root[data-theme='violet'] .generic-headline {
+:root[data-theme='arcade'] .ion-headline,
+:root[data-theme='arcade'] .generic-headline {
   filter: drop-shadow(0 0 20px var(--glow-violet));
 }
 
-:root[data-theme='violet'] .call-card-landed {
+:root[data-theme='arcade'] .call-card-landed {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), var(--shadow);
 }
 
-:root[data-theme='violet'] .bounce-ball {
+:root[data-theme='arcade'] .bounce-ball {
   background: var(--accent-gradient);
   box-shadow: 0 0 18px var(--glow-pink), 0 10px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* Jeopardy board + buzzer pick up the cyan secondary accent so the two
+   neon colors trade off, magenta-vs-cyan CRT style. */
+:root[data-theme='arcade'] .jeopardy-code-chip strong,
+:root[data-theme='arcade'] .jeopardy-board-cell,
+:root[data-theme='arcade'] .jeopardy-active-player,
+:root[data-theme='arcade'] .jeopardy-clue-category {
+  font-family: var(--font-arcade);
+}
+:root[data-theme='arcade'] .jeopardy-board-cell {
+  box-shadow: 0 0 0 1px var(--accent-cyan) inset;
+  color: var(--accent-cyan);
+}
+:root[data-theme='arcade'] .jeopardy-board-cell:hover:not(:disabled) {
+  box-shadow: 0 0 18px var(--glow-cyan), 0 0 0 1px var(--accent-cyan) inset;
+}
+:root[data-theme='arcade'] .jeopardy-buzz-button {
+  box-shadow: 0 10px 40px var(--glow-cyan), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+:root[data-theme='arcade'] .jeopardy-score-pill.is-active {
+  border-color: var(--accent-cyan);
+  background: var(--glow-cyan);
+  box-shadow: 0 0 14px var(--glow-cyan);
 }
 
 /* ===== Responsive ===== */

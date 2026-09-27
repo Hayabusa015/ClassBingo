@@ -19,7 +19,7 @@ import { loadState, saveState } from './lib/storage';
 import ThemeToggle from './components/ThemeToggle';
 
 export default function JeopardyPlayApp() {
-  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'violet');
+  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'arcade');
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     saveState('ui:theme', theme);

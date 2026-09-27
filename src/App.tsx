@@ -61,7 +61,7 @@ export default function App() {
   const [callStyle, setCallStyle] = useState<CallStyle>('both');
   const [winPattern, setWinPattern] = useState<WinPattern>('line');
   const [resumable, setResumable] = useState<SessionState | null>(null);
-  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'violet');
+  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'arcade');
   const decks = useMemo(() => [...DECK_ORDER.map(getDeck), ...library.map(playsetToDeck)], [library]);
   const deck = useMemo(
     () => (activeCustom ? playsetToDeck(activeCustom) : deckId ? findDeck(deckId) : null),

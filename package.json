@@ -1,8 +1,8 @@
 {
-  "name": "bingobash",
+  "name": "studyarcade",
   "private": true,
   "version": "1.0.2",
-  "description": "A projector-friendly bingo caller and printable-card generator for science classrooms.",
+  "description": "A projector-friendly arcade of classroom review games — Bingo, Memory, and live Jeopardy.",
   "author": "Matthew Shull",
   "type": "module",
   "main": "electron/main.cjs",
@@ -38,8 +38,8 @@
     "wait-on": "^9.1.0"
   },
   "build": {
-    "appId": "com.shullscience.bingobash",
-    "productName": "BingoBash",
+    "appId": "com.shullscience.studyarcade",
+    "productName": "StudyArcade",
     "files": [
       "dist/**/*",
       "electron/**/*",

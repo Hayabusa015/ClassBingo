@@ -80,8 +80,11 @@
   --shadow: none;
 }
 
-/* "Element Violet" — Asphalt Black / Slate / Electric Violet / Neon Pink. */
-:root[data-theme='violet'] {
+/* "Arcade" — retro 80s/90s synthwave cabinet: Asphalt Black / Slate /
+   Electric Violet / Neon Pink, now with a cyan secondary accent for that
+   classic magenta-vs-cyan CRT contrast. Evolves the original "Element
+   Violet" palette rather than replacing it. */
+:root[data-theme='arcade'] {
   --bg: #0c0d11;
   --bg-elevated: #14161b;
   --bg-card: #191c23;
@@ -102,20 +105,24 @@
   --accent-gradient: linear-gradient(135deg, #a855f7 0%, #ff3d8e 100%);
   --glow-violet: rgba(168, 85, 247, 0.4);
   --glow-pink: rgba(255, 61, 142, 0.35);
+  --accent-cyan: #2de3ff;
+  --glow-cyan: rgba(45, 227, 255, 0.35);
+
+  --font-arcade: 'Press Start 2P', 'VT323', var(--font-display);
 
   --shadow: 0 10px 32px rgba(168, 85, 247, 0.16), 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Glass panels: a translucent card fill so the glow behind it can bleed
    through where backdrop-filter is applied (app.css). */
-:root[data-theme='violet'] .deck-tile,
-:root[data-theme='violet'] .setup-card,
-:root[data-theme='violet'] .call-card,
-:root[data-theme='violet'] .called-board,
-:root[data-theme='violet'] .called-list,
-:root[data-theme='violet'] .winner-check,
-:root[data-theme='violet'] .resume-banner,
-:root[data-theme='violet'] .cardgen-controls {
+:root[data-theme='arcade'] .deck-tile,
+:root[data-theme='arcade'] .setup-card,
+:root[data-theme='arcade'] .call-card,
+:root[data-theme='arcade'] .called-board,
+:root[data-theme='arcade'] .called-list,
+:root[data-theme='arcade'] .winner-check,
+:root[data-theme='arcade'] .resume-banner,
+:root[data-theme='arcade'] .cardgen-controls {
   background: rgba(25, 28, 35, 0.72);
 }
 
@@ -133,15 +140,18 @@ body {
 }
 
 /* Soft bokeh glow + faint tech grid — no image assets, so it scales to any
-   screen and stays out of the way of the print stylesheet. */
-:root[data-theme='violet'] body {
+   screen and stays out of the way of the print stylesheet. The bottom glow
+   now leans cyan (vs. the top two staying violet/pink) for a synthwave
+   sunset-horizon feel, and the grid is a touch bolder to read as a retro
+   floor grid rather than a plain texture. */
+:root[data-theme='arcade'] body {
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse 640px 520px at 10% 6%, var(--glow-violet), transparent 60%),
     radial-gradient(ellipse 520px 480px at 92% 18%, var(--glow-pink), transparent 60%),
-    radial-gradient(ellipse 700px 560px at 50% 108%, var(--glow-violet), transparent 60%),
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    radial-gradient(ellipse 760px 600px at 50% 112%, var(--glow-cyan), transparent 62%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size:
     auto,
     auto,
@@ -150,4 +160,25 @@ body {
     46px 46px;
   background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
   background-attachment: fixed, fixed, fixed, fixed, fixed;
+  position: relative;
+}
+
+/* CRT scanline overlay: a very faint horizontal sweep fixed to the
+   viewport, purely decorative and non-interactive so it never touches
+   legibility or print. */
+:root[data-theme='arcade'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.09) 0px,
+    rgba(0, 0, 0, 0.09) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.5;
 }

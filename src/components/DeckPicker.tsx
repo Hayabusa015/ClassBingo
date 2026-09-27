@@ -74,8 +74,8 @@ export default function DeckPicker({
         <span className="home-eyebrow">
           <span className="status-spark" /> YOUR CLASSROOM. YOUR GAME.
         </span>
-        <h1>BingoBash</h1>
-        <p className="home-tagline">A playset for every kind of discovery.</p>
+        <h1>StudyArcade</h1>
+        <p className="home-tagline">Insert coin. Choose your game. Own the leaderboard.</p>
         <p className="subtitle">Choose a subject, tailor the items, and make it your game.</p>
       </header>
       {resumeBanner && (

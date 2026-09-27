@@ -125,7 +125,7 @@ export default function JeopardyHome({ onEdit, onHost, onBack, theme, onCycleThe
 
       <footer className="home-footer">
         <button className="btn btn-ghost" onClick={onBack}>
-          ← Back to BingoBash
+          ← Back to StudyArcade
         </button>
       </footer>
     </main>
