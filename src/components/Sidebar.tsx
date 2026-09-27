@@ -17,7 +17,7 @@ interface Props {
 export default function Sidebar({ active, onNavigate, onOpenLegal, theme, onCycleTheme }: Props) {
   return (
     <nav className="sidebar" aria-label="Main navigation">
-      <button className="sidebar-brand" onClick={() => onNavigate('landing')}>
+      <button className="sidebar-brand" aria-label="StudyArcade home" onClick={() => onNavigate('landing')}>
         <span className="sidebar-brand-mark" aria-hidden="true">
           S
         </span>

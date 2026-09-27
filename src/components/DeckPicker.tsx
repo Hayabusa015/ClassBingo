@@ -3,6 +3,7 @@ import type { DeckConfig, DeckId } from '../data/types';
 import type { GameMode } from '../lib/gameConfig';
 import { GAME_MODE_LABEL, GAME_MODE_TAGLINE } from '../lib/gameConfig';
 import ScienceArt from './ScienceArt';
+import Reveal from './Reveal';
 
 interface Props {
   decks: DeckConfig[];
@@ -156,7 +157,7 @@ export default function DeckPicker({
           const science = ['elements', 'ions', 'minerals', 'rocks'].includes(art);
           const custom = deck.id.startsWith('custom:');
           return (
-            <article className="library-entry" key={deck.id}>
+            <Reveal className="library-entry" key={deck.id}>
               <button className={`deck-tile deck-tile-${deck.id}`} onClick={() => onPick(deck.id)}>
                 <div className="library-deck-top">
                   <span>{deck.subject || 'Science'}</span>
@@ -208,7 +209,7 @@ export default function DeckPicker({
                     Delete saved playset
                   </button>
                 ))}
-            </article>
+            </Reveal>
           );
         })}
       </div>

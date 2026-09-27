@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import type { GameMode } from '../lib/gameConfig';
+import { getDeck } from '../data/decks';
+import { ElementTile } from './CallCard';
+import Reveal from './Reveal';
 import { GAME_MODE_LABEL, GAME_MODE_TAGLINE, GAME_MODES } from '../lib/gameConfig';
 import { BingoIcon, ChevronRightIcon, JeopardyIcon, MemoryIcon } from './NavIcons';
 import ShullLogo from './ShullLogo';
@@ -33,74 +37,106 @@ interface Props {
 }
 
 export default function LandingPage({ onNavigate, onOpenLegal }: Props) {
+  const [sample, setSample] = useState(0);
+  const samples = getDeck('elements').items.filter((item) =>
+    ['C', 'Ne', 'Cu', 'Au'].includes(item.symbol ?? ''),
+  );
   return (
     <main className="page page-landing">
       <section className="landing-hero">
-        <span className="home-eyebrow">
-          <span className="status-spark" /> YOUR CLASSROOM. YOUR GAME.
-        </span>
-        <h1 className="landing-headline">Turn any lesson into a game your class will beg to play.</h1>
-        <p className="landing-subtext">
-          Bingo, Memory, and live Jeopardy — built for the projector, tuned to your curriculum, zero logins
-          required.
-        </p>
-        <div className="landing-cta-row">
-          <button className="btn btn-primary btn-lg" onClick={() => onNavigate('bingo')}>
-            Enter the Arcade <ChevronRightIcon />
+        <div className="landing-hero-copy">
+          <p className="hero-context">Made for the moments that make it click.</p>
+          <h1 className="landing-headline">
+            <span>Good lessons.</span>
+            <span>Great game days.</span>
+          </h1>
+          <p className="landing-subtext">
+            Your curriculum, a little friendly competition. Turn review time into Bingo, Memory, or live
+            Jeopardy.
+          </p>
+          <div className="landing-cta-row">
+            <button className="btn btn-primary btn-lg" onClick={() => onNavigate('bingo')}>
+              Find a playset <ChevronRightIcon />
+            </button>
+            <a className="btn btn-secondary btn-lg" href="#how-it-works">
+              See how it works
+            </a>
+          </div>
+          <p className="hero-footnote">Ready-made subjects. Your own content. No login.</p>
+        </div>
+        <div className="landing-demo">
+          <div className="demo-heading">
+            <span>Bingo in action</span>
+            <span>Elements</span>
+          </div>
+          <div className="demo-element" aria-live="polite">
+            <ElementTile key={sample} item={samples[sample]} hideName={false} hideSymbol={false} />
+          </div>
+          <button className="demo-next" onClick={() => setSample((value) => (value + 1) % samples.length)}>
+            Try the next card <ChevronRightIcon />
           </button>
-          <a className="btn btn-secondary btn-lg" href="#how-it-works">
-            See how it works
-          </a>
         </div>
       </section>
 
-      <section className="landing-stats" aria-label="StudyArcade at a glance">
-        {STATS.map((stat) => (
-          <div className="landing-stat" key={stat.label}>
-            <span className="landing-stat-value">{stat.value}</span>
-            <span className="landing-stat-label">{stat.label}</span>
-          </div>
-        ))}
-      </section>
-
-      <section className="landing-modes" aria-label="Game modes">
-        {GAME_MODES.map((mode) => {
-          const Icon = MODE_ICON[mode];
-          return (
-            <article className={`landing-mode-card landing-mode-${mode}`} key={mode}>
-              <span className="landing-mode-icon">
-                <Icon />
-              </span>
-              <h3>{GAME_MODE_LABEL[mode]}</h3>
-              <p>{GAME_MODE_TAGLINE[mode]}</p>
-              <button className="btn btn-ghost landing-mode-link" onClick={() => onNavigate(mode)}>
-                Play {GAME_MODE_LABEL[mode]} <ChevronRightIcon />
-              </button>
-            </article>
-          );
-        })}
-      </section>
-
-      <section className="landing-steps" id="how-it-works" aria-label="How it works">
-        <h2>How it works</h2>
-        <div className="landing-steps-grid">
-          {STEPS.map((step, i) => (
-            <div className="landing-step" key={step.title}>
-              <span className="landing-step-num">{String(i + 1).padStart(2, '0')}</span>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
+      <Reveal>
+        <section className="landing-stats" aria-label="StudyArcade at a glance">
+          {STATS.map((stat) => (
+            <div className="landing-stat" key={stat.label}>
+              <span className="landing-stat-value">{stat.value}</span>
+              <span className="landing-stat-label">{stat.label}</span>
             </div>
           ))}
-        </div>
-      </section>
+        </section>
+      </Reveal>
 
-      <section className="landing-closing">
-        <h2>Built for your classroom. Ready today.</h2>
-        <p>No sign-up, no install required to try it — just pick a game and press start.</p>
-        <button className="btn btn-primary btn-lg" onClick={() => onNavigate('bingo')}>
-          Enter the Arcade <ChevronRightIcon />
-        </button>
-      </section>
+      <Reveal>
+        <div className="landing-section-heading">
+          <h2>One lesson. Three ways to play.</h2>
+          <p>Choose the pace that fits your classroom.</p>
+        </div>
+        <section className="landing-modes" aria-label="Game modes">
+          {GAME_MODES.map((mode) => {
+            const Icon = MODE_ICON[mode];
+            return (
+              <article className={`landing-mode-card landing-mode-${mode}`} key={mode}>
+                <span className="landing-mode-icon">
+                  <Icon />
+                </span>
+                <h3>{GAME_MODE_LABEL[mode]}</h3>
+                <p>{GAME_MODE_TAGLINE[mode]}</p>
+                <button className="btn btn-ghost landing-mode-link" onClick={() => onNavigate(mode)}>
+                  Play {GAME_MODE_LABEL[mode]} <ChevronRightIcon />
+                </button>
+              </article>
+            );
+          })}
+        </section>
+      </Reveal>
+
+      <Reveal>
+        <section className="landing-steps" id="how-it-works" aria-label="How it works">
+          <h2>How it works</h2>
+          <div className="landing-steps-grid">
+            {STEPS.map((step, i) => (
+              <div className="landing-step" key={step.title}>
+                <span className="landing-step-num">{String(i + 1).padStart(2, '0')}</span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal>
+        <section className="landing-closing">
+          <h2>Your next review session starts here.</h2>
+          <p>Pick a subject. Make it yours. Bring the class together.</p>
+          <button className="btn btn-primary btn-lg" onClick={() => onNavigate('bingo')}>
+            Browse playsets <ChevronRightIcon />
+          </button>
+        </section>
+      </Reveal>
 
       <footer className="landing-footer">
         <ShullLogo />

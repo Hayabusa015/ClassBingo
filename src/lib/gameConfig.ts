@@ -8,6 +8,9 @@ export type CallStyle = 'both' | 'challenge';
 
 export type Theme = 'arcade' | 'dark' | 'light' | 'contrast';
 export const THEME_ORDER: Theme[] = ['arcade', 'dark', 'light', 'contrast'];
+export function normalizeTheme(value: unknown): Theme {
+  return THEME_ORDER.includes(value as Theme) ? value as Theme : 'arcade';
+}
 export const THEME_LABEL: Record<Theme, string> = {
   arcade: 'Arcade',
   dark: 'Dark',

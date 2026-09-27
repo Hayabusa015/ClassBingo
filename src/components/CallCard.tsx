@@ -39,7 +39,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   unknown: 'Unknown properties',
 };
 
-function ElementTile({
+export function ElementTile({
   item,
   hideSymbol,
   hideName,

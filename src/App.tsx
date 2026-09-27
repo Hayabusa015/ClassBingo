@@ -4,7 +4,7 @@ import type { DeckConfig, DeckId } from './data/types';
 import { getFilteredItems, type GameSettings } from './lib/cards';
 import type { WinPattern } from './lib/bingo';
 import type { CallStyle, GameMode, NavTarget, SessionState, Theme, View } from './lib/gameConfig';
-import { SESSION_KEY, THEME_ORDER } from './lib/gameConfig';
+import { SESSION_KEY, THEME_ORDER, normalizeTheme } from './lib/gameConfig';
 import { loadState, saveState, clearState } from './lib/storage';
 import { randomGameCode } from './lib/rng';
 import type { MemorySettings } from './lib/memory';
@@ -65,7 +65,7 @@ export default function App() {
   const [callStyle, setCallStyle] = useState<CallStyle>('both');
   const [winPattern, setWinPattern] = useState<WinPattern>('line');
   const [resumable, setResumable] = useState<SessionState | null>(null);
-  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'arcade');
+  const [theme, setTheme] = useState<Theme>(() => normalizeTheme(loadState('ui:theme')));
   const decks = useMemo(() => [...DECK_ORDER.map(getDeck), ...library.map(playsetToDeck)], [library]);
   const deck = useMemo(
     () => (activeCustom ? playsetToDeck(activeCustom) : deckId ? findDeck(deckId) : null),
@@ -88,6 +88,10 @@ export default function App() {
     saveState('ui:theme', theme);
   }, [theme]);
   const cycleTheme = () => setTheme((t) => THEME_ORDER[(THEME_ORDER.indexOf(t) + 1) % THEME_ORDER.length]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [view, libraryMode, creating]);
 
   useEffect(() => {
     if (!['setup', 'caller', 'cardgen'].includes(view) || !deckId || !settings) return;

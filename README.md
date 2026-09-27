@@ -1,6 +1,6 @@
 # StudyArcade
 
-A retro-arcade review-game hub for classrooms: Bingo, Memory, and live
+A review-game hub for classrooms: Bingo, Memory, and live
 multiplayer Jeopardy, all built around a searchable, offline library of
 **22 classroom playsets**. Subjects include science, math, English, social
 studies, world languages, technology, arts, and health/PE. The original
@@ -13,6 +13,19 @@ Custom playsets are saved in this browser/device's local storage. Use
 **Export library** to back them up or move them to another computer; they do
 not automatically sync across devices. A static deployment updates the
 built-in catalog, not a user's saved library.
+
+## Interface and motion
+
+The default Arcade theme uses charcoal surfaces, a muted violet accent,
+clean system typography, and compact navigation. The home page includes a
+working element-card preview using the same component as the Bingo caller.
+Headlines enter in sequence, library tiles and sections reveal on scroll,
+and controls use subtle hover and pressed feedback. Anchor links scroll
+smoothly; changing screens returns to the top. Reduced-motion preferences
+disable decorative motion. These screen-only styles do not change printed cards.
+
+Dark, Light, and High contrast themes remain available. Older saved Violet
+preferences automatically migrate to Arcade.
 
 ## Quick start
 
@@ -69,10 +82,8 @@ npm test          # run the unit test suite
 - **Undo** (Backspace) takes back the last call.
 - **Reveal** (R) — only in Challenge mode — shows the hidden side of the
   current call.
-- **F** toggles fullscreen, **M** toggles sound, and the palette icon (on
-  every screen) cycles **Arcade** (the default — a retro 80s/90s neon
-  cabinet theme: glowing dark asphalt, electric violet, neon pink, and
-  cyan) → Dark → Light → High contrast.
+- **F** toggles fullscreen, **M** toggles sound, and the theme control
+  cycles **Arcade** (charcoal with muted violet) → Dark → Light → High contrast.
 - **Bingo Mode** (button in the header, or **B**) switches to a big,
   distraction-free display for the class board: a much larger call card,
   a bigger "Called so far" list. The numbered element board stays visible

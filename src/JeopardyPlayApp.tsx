@@ -14,12 +14,12 @@ import {
 } from './lib/jeopardy';
 import { supabase } from './lib/supabase';
 import type { Theme } from './lib/gameConfig';
-import { THEME_ORDER } from './lib/gameConfig';
+import { THEME_ORDER, normalizeTheme } from './lib/gameConfig';
 import { loadState, saveState } from './lib/storage';
 import ThemeToggle from './components/ThemeToggle';
 
 export default function JeopardyPlayApp() {
-  const [theme, setTheme] = useState<Theme>(() => loadState<Theme>('ui:theme') ?? 'arcade');
+  const [theme, setTheme] = useState<Theme>(() => normalizeTheme(loadState('ui:theme')));
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     saveState('ui:theme', theme);
