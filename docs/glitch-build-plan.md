@@ -17,6 +17,7 @@ This document is the full spec for implementing GLITCH in this repo. Build it **
   - `src/lib/memory.ts`: `pairLabel()` and `eligibleMemoryItems()`, which question generation reuses.
   - `src/components/MemorySetup.tsx`: playset setup screen, including filter and item selection.
   - `src/lib/gameConfig.ts`, `src/App.tsx`, `src/components/Sidebar.tsx`, `src/components/LandingPage.tsx`: routing and navigation.
+  - `src/styles/modern.css` and `src/components/Reveal.tsx`: the current visual language and entry animation (see §6.5).
 - **Backend:** Supabase project `xxlrpkspkvukddhbluap`, the same one Jeopardy uses. Apply schema changes as migrations. If you don't have Supabase access, write the SQL to a file and stop for the owner to apply it.
 - **Security model:** copy Jeopardy's exactly. See §4.
 - **Style:**
@@ -354,7 +355,8 @@ Also add pure helpers with tests for glitch count, meter goal, and the vote tall
   - `handlePickDeck` currently sends every non-memory mode to Bingo setup. **Add a `glitch` branch** that opens `glitch-setup` with the chosen deck.
   - Add `glitch-setup` and `glitch-host` render branches. Resume a saved host session on load, mirroring `loadHostSession()` for Jeopardy.
 - `src/components/DeckPicker.tsx`: set the eyebrow copy for `glitch` to "SOCIAL DEDUCTION" and the tile label to "Play GLITCH".
-- `src/components/LandingPage.tsx`: change the stat "3 Game modes" to 4, and mention GLITCH in the hero copy.
+- `src/components/LandingPage.tsx`: change the `STATS` entry "3 Game modes" to 4, and add GLITCH to the hero copy and the "Launch it live" step text (both currently list only Bingo/Memory/Jeopardy).
+- `index.html`: add GLITCH to the `<meta name="description">` game list.
 - `src/main.tsx`: a `?glitch` query param renders `<GlitchPlayApp />`. Keep `?play` → Jeopardy unchanged.
 - `README.md`: add GLITCH to the game list.
 
@@ -388,11 +390,12 @@ Also add pure helpers with tests for glitch count, meter goal, and the vote tall
 - Re-fetch `glitch_my_state` whenever a new round starts; roles can change in Outbreak.
 
 ### 6.5 Theming
+- **`src/styles/modern.css` is the current design source of truth.** It loads after the other feature stylesheets and deliberately gives the Arcade theme a restrained, sleek look (Linear-inspired): it sets `--glow-*` to `transparent`, points `--font-arcade` at the body font, and removes the background effects. Match that language. **Don't** reintroduce neon glows, scanlines, or pixel fonts.
+- Use theme tokens (`--bg-card`, `--border`, `--accent`, `--danger`, `--radius`), and `--ease-product` for motion. Respect `prefers-reduced-motion`.
+- For list/grid entries that animate in, use the existing `Reveal` component (`src/components/Reveal.tsx`), as `DeckPicker` does.
 - Must look right in all four themes (Arcade, Dark, Light, High contrast).
-- Arcade extras, scoped to `:root[data-theme='arcade']`:
-  - A cyan glow on the meter.
-  - A red/magenta flicker on CORRUPTED sectors.
-  - Existing `--font-arcade` for the join code, timer, and meter numbers only. Never for question text.
+- Tension comes from content, not effects: a clear meter, a crisp "CORRUPTED" state that uses `--danger`, and a large, tabular-numeral timer.
+- Theme init in `GlitchPlayApp`: copy `JeopardyPlayApp`, which uses `normalizeTheme(loadState('ui:theme'))`.
 
 ---
 
